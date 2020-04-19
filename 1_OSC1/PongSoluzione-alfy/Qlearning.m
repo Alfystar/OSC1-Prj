@@ -14,16 +14,16 @@ i=1;        % Variabile per contare le iterazioni
 
 % inizializzazione casuale
 rng(4)
-Q = load('QBest.mat');
-Qup = Q.Qup; Qdown = Q.Qdown; Qstill = Q.Qstill;
+% Q = load('QBest.mat');
+% Qup = Q.Qup; Qdown = Q.Qdown; Qstill = Q.Qstill;
 % X1 = Xpalla arrotondato per eccesso (L+1)
 % X2 = Ypalla arrotondato per eccesso (H+1)
 % X3 = ybarra
 % X4 = se vx pos = 2, se vx neg = 1, (se vx=0 1.5!!!)
 % X5 = se vy pos = 2, se vy neg = 1, (se vy=0 1.5!!!)
-% Qup =       zeros(L+1,H+1,length(V),2,2);
-% Qdown =     zeros(L+1,H+1,length(V),2,2);
-% Qstill =    zeros(L+1,H+1,length(V),2,2);
+Qup =       zeros(L+1,H+1,length(V),2,2);
+Qdown =     zeros(L+1,H+1,length(V),2,2);
+Qstill =    zeros(L+1,H+1,length(V),2,2);
 
 
 %%
