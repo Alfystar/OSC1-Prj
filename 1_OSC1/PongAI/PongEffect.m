@@ -1,8 +1,8 @@
-function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,fig)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff)
 
-% close all
 
 global L H alpha gamma eps V
+global Ln Hn Vn velSig    % Settori Discretizzati
 
 % [xb0, yb0]: posizione iniziale della pallina
 % [0, yp0]:   posizione iniziale della barretta
@@ -10,11 +10,12 @@ global L H alpha gamma eps V
 Lb = 1;                 % lunghezza della barretta
 theta = 0:0.01:2*pi;
 rad = 0.2;
-% Figura = 1;
-Figura = fig;
+
+Figura = figOnOff;
 
 if Figura == 1
-    clf
+    close all
+    figure(1)
     hold on
     box on
     axis([-1 L+1 -1 H+1])
@@ -34,18 +35,36 @@ if Figura == 1
     hT1 = line([L,L],[6,7]);
     hT1.Color = [1,0,0];
     hT1.LineWidth = 6;
+    
+    for i = 1 : Ln
+        l = line([0 L],[i/Ln*H,i/Ln*H]);
+        l.Color = [0,0,0];
+        l.LineWidth = 1;
+    end
+    
+    for i = 1 : Hn
+        l = line([i/Hn*L i/Hn*L],[0,H]);
+        l.Color = [0,0,0];
+        l.LineWidth = 1;
+    end
+    
+    for i = 1 : length(V)
+        %         xb+rad*cos(theta),yb+rad*sin(theta)
+        ball = fill(0.1*cos(theta)-0.5,V(i)+0.1*sin(theta),[0,0.5,0.5]);
+    end
+    
+    
 end
 
-xb = xb0; yb = yb0; yp = yp0;                     % posizioni correnti di pallina e barretta
+xb = xb0; yb = yb0; ys = ys0;                     % posizioni correnti di pallina e barretta
 vx = 0.1; vy = 0.1;                               % velocità iniziale arbitraria
-vb = 0.2;                                         % velocità della barretta
-X1 = ceil(xb); X2 = ceil(yb);                     % stato corrente pallina e barretta
-[~,clsIdx] = min(abs(V-yp));
-X3 = clsIdx;
+vb = 0.2;                                         % velocità della barretta COSTANTE
 
 flagFirst = 1;
 maxiter = 10000;
 score = 0;
+
+[i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
 
 % finchè la pallina non finisce oltre la barretta...
 counter = 0;
@@ -55,9 +74,21 @@ while xb > 0 && counter < maxiter
     
     if Figura == 1
         % disegniamo la posizione corrente della pallina
-        ball = patch(xb+rad*cos(theta),yb+rad*sin(theta),[1,0,0]);
+        
+        i5n
+        if(i5n == 1) % neg
+            C = [0.8,0,0];
+        elseif(i5n == 2) % ~0
+            C = [0,0,0];
+        elseif(i5n == 3) % pos
+            C = [0,0.8,0];
+        end
+        
+        ball = patch(xb+rad*cos(theta),yb+rad*sin(theta),C);
+        
         % disegniamo la posizione corrente della barretta
-        bar = line([0,0],[yp+Lb,yp-Lb]);
+        bar = line([0,0],[ys+Lb,ys-Lb]);
+        barCenter = fill(0.1*cos(theta),ys+0.1*sin(theta),[0.8,0,0]);
         bar.Color = [0,0,0];
         bar.LineWidth = 10;
         htxt = text(1,H+0.5, strcat('rimbalzi:',num2str(counter)) );
@@ -66,13 +97,19 @@ while xb > 0 && counter < maxiter
         pause(0.001)
     end
     
+    
+    
+    
+    [i1, i2, i3, i4 ,i5] = state2index(xb,yb,ys,vx,vy);
+    
+    
+    
     % aggiorniamo la posizione della pallina
-    X1 = ceil(xb); X2 = ceil(yb); X4 = 2*sign(vx)+1.5*(1-sign(vx)); X5 = 2*sign(vy)+1.5*(1-sign(vy));
     xb = xb+vx;
     yb = yb+vy;
+    
     % aggiorniamo lo stato della pallina
-    X1p = max(1,ceil(xb)); X2p = max(1,ceil(yb)); 
-  
+    
     % controlliamo se la pallina sbatte contro un bordo
     if (xb >= L-rad) && (vx >= 0)  % tocca il fondo
         vx = -vx;
@@ -85,91 +122,103 @@ while xb > 0 && counter < maxiter
     elseif (yb <= rad) && (vy <= 0)    %tocca il bordo inferiore
         vy = -vy;
     end
-    X4p = 2*sign(vx)+1.5*(1-sign(vx)); X5p = 2*sign(vy)+1.5*(1-sign(vy));
     
-    % controlliamo se la barretta è in grado di respingere la pallina
-    if (xb <= rad) && (yb+rad >= yp-Lb) && (yb-rad <= yp+Lb)
+    % sassano aggiornava tutto tranne i3 qua
+    %[i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
+    
+    % controlliamo se la barretta è in grado di respingere la pallina, e in
+    % caso assegno il Reward_K+1
+    if (xb <= rad) && (yb+rad >= ys-Lb) && (yb-rad <= ys+Lb)
         vx = -vx;
-        if yb+rad <= yp-0.33*Lb || yb-rad >= yp+0.33*Lb
+        if yb+rad <= ys-0.33*Lb || yb-rad >= ys+0.33*Lb
             lambda = rand;
             vy = 0.5*vy+(-0.02*lambda+(1-lambda)*0.02);
         end
         reward = 1;
         counter = counter+1;
-    end   
+    end
+    
+    
     
     % aggiorniamo la posizione della barretta con strategia epsilon-greedy
-    [~,clsIdx] = min(abs(V-yp));
-    X3 = clsIdx;
+    
     coin = rand;
     if coin > eps
-        if Qup(X1,X2,X3,X4,X5) >= Qdown(X1,X2,X3,X4,X5) && Qup(X1,X2,X3,X4,X5) >= Qstill(X1,X2,X3,X4,X5) && (yp+Lb <= H-vb)
-            yp = yp+vb;
+        if Qup(i1,i2,i3,i4,i5) >= Qdown(i1,i2,i3,i4,i5) && Qup(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys+Lb <= H-vb)
+            ys = ys+vb;
             ctr = 1;
-        elseif Qdown(X1,X2,X3,X4,X5) > Qup(X1,X2,X3,X4,X5) && Qdown(X1,X2,X3,X4,X5) >= Qstill(X1,X2,X3,X4,X5) && (yp-Lb >= vb)
-            yp = yp-vb;
+        elseif Qdown(i1,i2,i3,i4,i5) > Qup(i1,i2,i3,i4,i5) && Qdown(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys-Lb >= vb)
+            ys = ys-vb;
             ctr = -1;
         else
-            yp = yp;
+            ys = ys;
             ctr = 0;
         end
     elseif coin < eps
         rnd_ctr = rand;
-        if rnd_ctr < 0.33 && (yp+Lb <= H-vb)
-            yp = yp+vb;
+        if rnd_ctr < 0.33 && (ys+Lb <= H-vb)
+            ys = ys+vb;
             ctr = 1;
-        elseif rnd_ctr >= 0.33 && rnd_ctr < 0.66 && (yp-Lb >= vb)
-            yp = yp-vb;
+        elseif rnd_ctr >= 0.33 && rnd_ctr < 0.66 && (ys-Lb >= vb)
+            ys = ys-vb;
             ctr = -1;
         else
-            yp = yp;
+            ys = ys;
             ctr = 0;
         end
     end
-    %barretta che insegue la pallina..
-    %yp = yb;
+    
     % aggiorniamo lo stato della barretta
-    [~,clsIdx] = min(abs(V-yp));
-    X3p = clsIdx;
-       
-    % aggiorniamo le funzioni Q
-    % determiniamo la migliore azione per l'iterazione successiva
-    if Qup(X1p,X2p,X3p,X4p,X5p) >= Qdown(X1p,X2p,X3p,X4p,X5p) && Qup(X1p,X2p,X3p,X4p,X5p) >= Qstill(X1p,X2p,X3p,X4p,X5p) && (yp+Lb <= H-vb)
-        ctrp = 1;
-    elseif Qdown(X1p,X2p,X3p,X4p,X5p) > Qup(X1p,X2p,X3p,X4p,X5p) && Qdown(X1p,X2p,X3p,X4p,X5p) >= Qstill(X1p,X2p,X3p,X4p,X5p) && (yp-Lb >= vb)
-        ctrp = -1;
-    else
-        ctrp = 0;
+    %     [~,clsIdx] = min(abs(V-ys));
+    %     i3n = clsIdx;
+    
+    [i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
+    
+    if (Figure == 0 ) % procedo con classica RL
+        % aggiorniamo le funzioni Q
+        % determiniamo la migliore azione per l'iterazione successiva
+        if Qup(i1n,i2n,i3n,i4n,i5n) >= Qdown(i1n,i2n,i3n,i4n,i5n) && Qup(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys+Lb <= H-vb)
+            ctrp = 1;
+        elseif Qdown(i1n,i2n,i3n,i4n,i5n) > Qup(i1n,i2n,i3n,i4n,i5n) && Qdown(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys-Lb >= vb)
+            ctrp = -1;
+        else
+            ctrp = 0;
+        end
+        
+        if (xb<=0)
+            reward = -100;
+        end
+        
+        % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
+        if ctr == 1 && ctrp == 1
+            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        elseif ctr == 1 && ctrp == 0
+            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        elseif ctr == 1 && ctrp == -1
+            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        elseif ctr == 0 && ctrp == 1
+            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        elseif ctr == 0 && ctrp == 0
+            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        elseif ctr == 0 && ctrp == -1
+            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        elseif ctr == -1 && ctrp == 1
+            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        elseif ctr == -1 && ctrp == 0
+            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        elseif ctr == -1 && ctrp == -1
+            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        end
     end
     
-    if (xb<=0)
-        reward = -100;
-    end
-    
-    % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
-    if ctr == 1 && ctrp == 1
-        Qup(X1,X2,X3,X4,X5) = Qup(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qup(X1p,X2p,X3p,X4p,X5p)-Qup(X1,X2,X3,X4,X5));
-    elseif ctr == 1 && ctrp == 0
-        Qup(X1,X2,X3,X4,X5) = Qup(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qstill(X1p,X2p,X3p,X4p,X5p)-Qup(X1,X2,X3,X4,X5));
-    elseif ctr == 1 && ctrp == -1
-        Qup(X1,X2,X3,X4,X5) = Qup(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qdown(X1p,X2p,X3p,X4p,X5p)-Qup(X1,X2,X3,X4,X5));
-    elseif ctr == 0 && ctrp == 1
-        Qstill(X1,X2,X3,X4,X5) = Qstill(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qup(X1p,X2p,X3p,X4p,X5p)-Qstill(X1,X2,X3,X4,X5));
-    elseif ctr == 0 && ctrp == 0
-        Qstill(X1,X2,X3,X4,X5) = Qstill(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qstill(X1p,X2p,X3p,X4p,X5p)-Qstill(X1,X2,X3,X4,X5));
-    elseif ctr == 0 && ctrp == -1
-        Qstill(X1,X2,X3,X4,X5) = Qstill(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qdown(X1p,X2p,X3p,X4p,X5p)-Qstill(X1,X2,X3,X4,X5));    
-    elseif ctr == -1 && ctrp == 1
-        Qdown(X1,X2,X3,X4,X5) = Qdown(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qup(X1p,X2p,X3p,X4p,X5p)-Qdown(X1,X2,X3,X4,X5));
-    elseif ctr == -1 && ctrp == 0
-        Qdown(X1,X2,X3,X4,X5) = Qdown(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qstill(X1p,X2p,X3p,X4p,X5p)-Qdown(X1,X2,X3,X4,X5));
-    elseif ctr == -1 && ctrp == -1
-        Qdown(X1,X2,X3,X4,X5) = Qdown(X1,X2,X3,X4,X5) + alpha*(reward+gamma*Qdown(X1p,X2p,X3p,X4p,X5p)-Qdown(X1,X2,X3,X4,X5));
+    if (Figure == 1 ) % procedo con RBF
+        
     end
     
     if Figura == 1
         delete(ball)
         delete(bar)
+        delete(barCenter)
         delete(htxt)
         delete(hscore)
     end
@@ -178,3 +227,54 @@ end
 
 rimbalzi = counter;
 chk = -1;
+end
+
+% X1(Xball)  = Xpalla arrotondato per eccesso (L+1)
+% X2(Yball)  = Ypalla arrotondato per eccesso (H+1)
+% X3(Ybarr)  = ybarra
+% X4(VxBall) = se vx % 1 = neg, 2 = ~0 , 3 = pos
+% X5(VyBall) = se vy % 1 = neg, 2 = ~0 , 3 = pos
+
+function [i1, i2, i3, i4 ,i5] = state2index(Xball,Yball,Ybarr,VxBall,VyBall)
+global L H V;
+global Ln Hn;
+% VxBall
+% VyBall
+i1 = min(max(1,ceil(Xball/L * Ln)),Ln);
+i2 = min(max(1,ceil(Yball/H * Hn)),Hn);
+
+[~,i3] = min(abs(V-Ybarr));
+
+if(abs(VxBall)<0.01)
+    i4 = 2;
+else
+    i4 = sign(VxBall) + 2;
+end
+
+if(abs(VyBall)<0.01)
+    i5 = 2;
+else
+    i5 = sign(VyBall) + 2;
+end
+
+end
+
+function [G] = RBFMatrix (Qup, Qstill, Qdown)
+
+end
+
+function [state] = scalar2vect(Xball,Yball,Ybarr,VxBall,VyBall)
+    state = [Xball,Yball,Ybarr,VxBall,VyBall];
+end
+
+function [center] = index2state(i1, i2, i3, i4 ,i5)
+global L H V;
+global Ln Hn;
+    center = [
+        i1/Ln * L, ...  %Xball center
+        i2/Hn * H, ...  %Yball center
+        i3/length(V) * V(end), ...      %Ybarr center
+        i4-2, ...     %VxBall center
+        i5-2 ...      %VyBall center
+        ];
+end
