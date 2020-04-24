@@ -1,11 +1,14 @@
-function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, SBROnOff)
 
 
 global L H alpha gamma eps V
 global Ln Hn Vn velSig    % Settori Discretizzati
 
+global beta;
+beta = 0.3;
 % [xb0, yb0]: posizione iniziale della pallina
 % [0, yp0]:   posizione iniziale della barretta
+
 
 Lb = 1;                 % lunghezza della barretta
 theta = 0:0.01:2*pi;
@@ -64,6 +67,11 @@ flagFirst = 1;
 maxiter = 10000;
 score = 0;
 
+G = RBFMatrix ();
+Wup = G\Bvector(Qup);
+Wstill = G\Bvector(Qstill);
+Wdown = G\Bvector(Qdown);
+
 [i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
 
 % finchè la pallina non finisce oltre la barretta...
@@ -75,7 +83,6 @@ while xb > 0 && counter < maxiter
     if Figura == 1
         % disegniamo la posizione corrente della pallina
         
-        i5n
         if(i5n == 1) % neg
             C = [0.8,0,0];
         elseif(i5n == 2) % ~0
@@ -141,18 +148,23 @@ while xb > 0 && counter < maxiter
     
     
     % aggiorniamo la posizione della barretta con strategia epsilon-greedy
-    
     coin = rand;
     if coin > eps
-        if Qup(i1,i2,i3,i4,i5) >= Qdown(i1,i2,i3,i4,i5) && Qup(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys+Lb <= H-vb)
-            ys = ys+vb;
-            ctr = 1;
-        elseif Qdown(i1,i2,i3,i4,i5) > Qup(i1,i2,i3,i4,i5) && Qdown(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys-Lb >= vb)
-            ys = ys-vb;
-            ctr = -1;
-        else
-            ys = ys;
-            ctr = 0;
+        if (SBROnOff == 0 ) % procedo con classica RL
+            if Qup(i1,i2,i3,i4,i5) >= Qdown(i1,i2,i3,i4,i5) && Qup(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys+Lb <= H-vb)
+                ys = ys+vb;
+                ctr = 1;
+            elseif Qdown(i1,i2,i3,i4,i5) > Qup(i1,i2,i3,i4,i5) && Qdown(i1,i2,i3,i4,i5) >= Qstill(i1,i2,i3,i4,i5) && (ys-Lb >= vb)
+                ys = ys-vb;
+                ctr = -1;
+            else
+                ys = ys;
+                ctr = 0;
+            end
+        end
+        if (SBROnOff == 1 ) % procedo con SBR
+            [ctr] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup);            
+            
         end
     elseif coin < eps
         rnd_ctr = rand;
@@ -168,20 +180,25 @@ while xb > 0 && counter < maxiter
         end
     end
     
+    
+    
+    
     % aggiorniamo lo stato della barretta
     %     [~,clsIdx] = min(abs(V-ys));
     %     i3n = clsIdx;
     
     [i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
     
-    if (Figure == 0 ) % procedo con classica RL
         % aggiorniamo le funzioni Q
         % determiniamo la migliore azione per l'iterazione successiva
         if Qup(i1n,i2n,i3n,i4n,i5n) >= Qdown(i1n,i2n,i3n,i4n,i5n) && Qup(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys+Lb <= H-vb)
             ctrp = 1;
+            Wup = interpolate(G,Qup);
         elseif Qdown(i1n,i2n,i3n,i4n,i5n) > Qup(i1n,i2n,i3n,i4n,i5n) && Qdown(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys-Lb >= vb)
             ctrp = -1;
+            Wdown = interpolate(G,Qdown);
         else
+            Wstill = interpolate(G,Qstill);
             ctrp = 0;
         end
         
@@ -209,11 +226,6 @@ while xb > 0 && counter < maxiter
         elseif ctr == -1 && ctrp == -1
             Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
         end
-    end
-    
-    if (Figure == 1 ) % procedo con RBF
-        
-    end
     
     if Figura == 1
         delete(ball)
@@ -259,22 +271,107 @@ end
 
 end
 
-function [G] = RBFMatrix (Qup, Qstill, Qdown)
+function [G] = RBFMatrix ()
+global beta;
+global Ln Hn V velSig;
+G = eye(Ln * Hn * length(V) * velSig * velSig);
+i = 1;
+for i1 = 1 : Ln
+    for i2 = 1 : Hn
+        for i3 = 1 : length(V)
+            for i4 = 1 : velSig
+                for i5 = 1 : velSig
+                    [C1] = index2state(i1, i2, i3, i4 ,i5);
+                    j = i;
+                    % In teoria G è simmetrica, e la diagonale è tutta di 1
+                    for j1 = i1 : Ln
+                        for j2 = i2 : Hn
+                            for j3 = i3 : length(V)
+                                for j4 = i4 : velSig
+                                    for j5 = i5 : velSig
+                                        [C2] = index2state(j1, j2, j3, j4 ,j5);
+                                        G(i,j) = exp(-beta*sum((C1-C2).^2));
+                                        G(j,i) = G(i,j);
+                                        j = j+1;
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    i = i+1;
+                    
+                end
+            end
+        end
+    end
+end
+end
 
+function [B] = Bvector (Q)
+global Ln Hn V velSig;
+B = zeros(Ln * Hn * length(V) * velSig * velSig,1);
+i=1;
+for i1 = 1 : Ln
+    for i2 = 1 : Hn
+        for i3 = 1 : length(V)
+            for i4 = 1 : velSig
+                for i5 = 1 : velSig
+                    B(i) = Q(i1, i2, i3, i4 ,i5);
+                    i=i+1;
+                end
+            end
+        end
+    end
+end
+end
+
+function  [rho] = NodeValue (state)
+global Ln Hn V velSig;
+global beta;
+rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
+i=1;
+for i1 = 1 : Ln
+    for i2 = 1 : Hn
+        for i3 = 1 : length(V)
+            for i4 = 1 : velSig
+                for i5 = 1 : velSig
+                    [C1] = index2state(i1, i2, i3, i4 ,i5);
+                    rho(i) = exp(-beta*sum((C1-state).^2));
+                    i=i+1;
+                end
+            end
+        end
+    end
+end
+end
+
+
+function [w] = interpolate (G,Q)
+coder.gpu.kernelfun
+w = G \ Bvector(Q);
+end
+
+function [ctr] = bestControll (state, Wdown, Wstill, Wup)
+coder.gpu.kernelfun
+rho = NodeValue (state);
+            
+% MAX di MAX da fare
+[~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
+ctr = I - 2;
 end
 
 function [state] = scalar2vect(Xball,Yball,Ybarr,VxBall,VyBall)
-    state = [Xball,Yball,Ybarr,VxBall,VyBall];
+state = [Xball,Yball,Ybarr,VxBall,VyBall];
 end
 
 function [center] = index2state(i1, i2, i3, i4 ,i5)
 global L H V;
 global Ln Hn;
-    center = [
-        i1/Ln * L, ...  %Xball center
-        i2/Hn * H, ...  %Yball center
-        i3/length(V) * V(end), ...      %Ybarr center
-        i4-2, ...     %VxBall center
-        i5-2 ...      %VyBall center
-        ];
+center = [
+    i1/Ln * L, ...  %Xball center
+    i2/Hn * H, ...  %Yball center
+    i3/length(V) * V(end), ...      %Ybarr center
+    i4-2, ...     %VxBall center
+    i5-2 ...      %VyBall center
+    ];
 end

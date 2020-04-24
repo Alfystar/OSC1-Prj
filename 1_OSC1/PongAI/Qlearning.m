@@ -22,17 +22,19 @@ i=1;        % Variabile per contare le iterazioni
 
 % inizializzazione casuale
 rng(4)
-Q = load('Qreduce1.mat');
-Qup = Q.Qup; Qdown = Q.Qdown; Qstill = Q.Qstill;
+% Q = load('Qreduce1.mat');
+% Qup = Q.Qup; Qdown = Q.Qdown; Qstill = Q.Qstill;
+% plotMed = Q.plotMed;
+% scorePlotmed = Q.scorePlotmed;
+% rimbalziPlotmed = Q.rimbalziPlotmed;
 % X1(Xball)  = Xpalla arrotondato per eccesso (L+1)
 % X2(Yball)  = Ypalla arrotondato per eccesso (H+1)
 % X3(Ybarr)  = ybarra
 % X4(VxBall) = se vx % 1 = neg, 2 = ~0 , 3 = pos
 % X5(VyBall) = se vy % 1 = neg, 2 = ~0 , 3 = pos
-% Qup =       zeros(Ln,Hn,length(V),velSig,velSig);
-% Qdown =     zeros(Ln,Hn,length(V),velSig,velSig);
-% Qstill =    zeros(Ln,Hn,length(V),velSig,velSig);
-
+Qup =       zeros(Ln,Hn,length(V),velSig,velSig);
+Qdown =     zeros(Ln,Hn,length(V),velSig,velSig);
+Qstill =    zeros(Ln,Hn,length(V),velSig,velSig);
 plotMed = 1;
 scorePlotmed = [];
 rimbalziPlotmed = [];
@@ -42,6 +44,7 @@ chk = -1;
 gamma = 0.1;              % Peso esperienze future
 alpha = 1;            % Peso nuova esperienza
 eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+ite = 10;
 
 
 while(1)
@@ -50,7 +53,6 @@ while(1)
     QupOld = Qup;
     QdownOld = Qdown;
     QstillOld = Qstill;
-    ite = 1000;
     scoreTot=0;
     rimbalziTot=0;
     scorePlot = zeros(ite,1);
@@ -60,7 +62,7 @@ while(1)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0);
+        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0, 1);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
@@ -132,6 +134,6 @@ xb0 = L*xRnd;
 yb0 = H*yRnd;
 yp0 = (H-1)*bRnd+1;
 
-[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
+[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,0);
 eps =epsOld;
 
