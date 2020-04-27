@@ -68,9 +68,12 @@ maxiter = 10000;
 score = 0;
 
 G = RBFMatrix ();
+G = gpuArray( G );
+
 Wup = G\Bvector(Qup);
 Wstill = G\Bvector(Qstill);
 Wdown = G\Bvector(Qdown);
+
 
 [i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
 
@@ -164,7 +167,13 @@ while xb > 0 && counter < maxiter
         end
         if (SBROnOff == 1 ) % procedo con SBR
             [ctr] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup);            
-            
+            if ctr == 1 && (ys+Lb <= H-vb)
+                ys = ys+vb;
+            elseif ctr == -1 && (ys-Lb >= vb)
+                ys = ys-vb;
+            else
+                ys = ys;
+            end
         end
     elseif coin < eps
         rnd_ctr = rand;
@@ -189,43 +198,60 @@ while xb > 0 && counter < maxiter
     
     [i1n, i2n, i3n, i4n ,i5n] = state2index(xb,yb,ys,vx,vy);
     
-        % aggiorniamo le funzioni Q
-        % determiniamo la migliore azione per l'iterazione successiva
+    % aggiorniamo le funzioni Q
+    % determiniamo la migliore azione per l'iterazione successiva
+    if (SBROnOff == 0 ) % procedo con SBR
         if Qup(i1n,i2n,i3n,i4n,i5n) >= Qdown(i1n,i2n,i3n,i4n,i5n) && Qup(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys+Lb <= H-vb)
-            ctrp = 1;
-            Wup = interpolate(G,Qup);
+            ctrN = 1;
         elseif Qdown(i1n,i2n,i3n,i4n,i5n) > Qup(i1n,i2n,i3n,i4n,i5n) && Qdown(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys-Lb >= vb)
-            ctrp = -1;
-            Wdown = interpolate(G,Qdown);
+            ctrN = -1;
         else
-            Wstill = interpolate(G,Qstill);
-            ctrp = 0;
+            ctrN = 0;
         end
-        
-        if (xb<=0)
-            reward = -100;
+    end
+    
+    if (SBROnOff == 1 ) % procedo con SBR
+        [ctrN] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup);
+        if ctrN == 1 && ~(ys+Lb <= H-vb)
+            ctrN = 0;
+        elseif ctrN == -1 && ~(ys-Lb >= vb)
+            ctrN = 0;
         end
-        
-        % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
-        if ctr == 1 && ctrp == 1
-            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        elseif ctr == 1 && ctrp == 0
-            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        elseif ctr == 1 && ctrp == -1
-            Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        elseif ctr == 0 && ctrp == 1
-            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        elseif ctr == 0 && ctrp == 0
-            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        elseif ctr == 0 && ctrp == -1
-            Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        elseif ctr == -1 && ctrp == 1
-            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        elseif ctr == -1 && ctrp == 0
-            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        elseif ctr == -1 && ctrp == -1
-            Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        end
+    end
+    
+    if (xb<=0)
+        reward = -1;
+    end
+    
+    % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
+    if ctr == 1 && ctrN == 1
+        Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        Wup = interpolate(G,Qup);
+    elseif ctr == 1 && ctrN == 0
+        Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        Wup = interpolate(G,Qup);
+    elseif ctr == 1 && ctrN == -1
+        Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
+        Wup = interpolate(G,Qup);
+    elseif ctr == 0 && ctrN == 1
+        Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        Wstill = interpolate(G,Qstill);
+    elseif ctr == 0 && ctrN == 0
+        Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        Wstill = interpolate(G,Qstill);
+    elseif ctr == 0 && ctrN == -1
+        Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
+        Wstill = interpolate(G,Qstill);
+    elseif ctr == -1 && ctrN == 1
+        Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        Wdown = interpolate(G,Qdown);
+    elseif ctr == -1 && ctrN == 0
+        Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        Wdown = interpolate(G,Qdown);
+    elseif ctr == -1 && ctrN == -1
+        Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
+        Wdown = interpolate(G,Qdown);
+    end
     
     if Figura == 1
         delete(ball)
@@ -348,13 +374,18 @@ end
 
 function [w] = interpolate (G,Q)
 coder.gpu.kernelfun
-w = G \ Bvector(Q);
+b = gpuArray( Bvector(Q) );
+% g = gpuArray( G ); % Fatto fuori per risparmiare passaggi
+w = G \ b ;
 end
 
 function [ctr] = bestControll (state, Wdown, Wstill, Wup)
 coder.gpu.kernelfun
-rho = NodeValue (state);
-            
+rho = gpuArray(NodeValue (state));
+% Wdown = gpuArray(Wdown);
+% Wstill = gpuArray(Wstill);
+% Wup = gpuArray(Wup);
+
 % MAX di MAX da fare
 [~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
 ctr = I - 2;

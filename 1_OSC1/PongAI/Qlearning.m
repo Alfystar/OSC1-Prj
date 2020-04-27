@@ -24,9 +24,9 @@ i=1;        % Variabile per contare le iterazioni
 rng(4)
 % Q = load('Qreduce1.mat');
 % Qup = Q.Qup; Qdown = Q.Qdown; Qstill = Q.Qstill;
-% plotMed = Q.plotMed;
-% scorePlotmed = Q.scorePlotmed;
-% rimbalziPlotmed = Q.rimbalziPlotmed;
+% plotMed = Q.plotMed; scorePlotmed = Q.scorePlotmed; rimbalziPlotmed = Q.rimbalziPlotmed;
+% gamma = Q.gamma; alpha = Q.alpha; eps = Q.eps;              
+
 % X1(Xball)  = Xpalla arrotondato per eccesso (L+1)
 % X2(Yball)  = Ypalla arrotondato per eccesso (H+1)
 % X3(Ybarr)  = ybarra
@@ -39,11 +39,13 @@ plotMed = 1;
 scorePlotmed = [];
 rimbalziPlotmed = [];
 
-%%
-chk = -1;
 gamma = 0.1;              % Peso esperienze future
 alpha = 1;            % Peso nuova esperienza
 eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+
+
+%%
+chk = -1;
 ite = 10;
 
 
@@ -72,8 +74,8 @@ while(1)
     end
     %[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
     eps = eps*0.99;
-    alpha = alpha*0.999;
-    gamma = gamma *1.0001;
+    alpha = alpha*0.9995;
+    gamma = gamma *1.0005;
     if(gamma >=0.95)
         gamma = 0.95;
     end
@@ -117,7 +119,7 @@ end
 
 %%
 %%% Calcolo della funzione Valore %%%
-Vpi = zeros(L+1,H+1,length(V),2,2);
+Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
 for i =i/Hn*L 1:L+1
     for j = 1:H+1
         for k = 1:length(V)
@@ -134,6 +136,6 @@ xb0 = L*xRnd;
 yb0 = H*yRnd;
 yp0 = (H-1)*bRnd+1;
 
-[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,0);
+[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,1);
 eps =epsOld;
 
