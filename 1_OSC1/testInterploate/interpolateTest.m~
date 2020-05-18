@@ -1,0 +1,7 @@
+clear variable
+
+x = [0 1 2];
+y = [0 1];
+[X,Y] = meshgrid(x);
+F = X.*exp(-X.^2-Y.^2);
+surf(X,Y,F)

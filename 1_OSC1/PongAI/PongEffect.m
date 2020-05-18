@@ -311,7 +311,7 @@ for i1 = 1 : Ln
     for i2 = 1 : Hn
         for i3 = 1 : length(V)
             for i4 = 1 : velSig
-                for i5 = 1 : velSig
+                interpolatefor i5 = 1 : velSig
                     [C1] = index2state(i1, i2, i3, i4 ,i5);
                     j = i;
                     % In teoria G è simmetrica, e la diagonale è tutta di 1
