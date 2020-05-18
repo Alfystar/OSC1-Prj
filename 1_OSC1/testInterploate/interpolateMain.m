@@ -7,7 +7,7 @@ xMax = 10;
 yMax = 10;
 beta = betaV;
 
-G = RBFMatrix ()
+G = RBFMatrix ();
 
 % Creo La Q campionando la funzione x^+y^2 per ogni x e y tra 0 e nCenter
 Q = zeros(nCenterX,nCenterY);
@@ -19,7 +19,7 @@ for i1 = 1 : nCenterX
 end
 
 
-[w] = interpolate (G,Q)
+[w] = interpolate (G,Q);
 
 
 
@@ -55,10 +55,12 @@ for i1 = 1 : nCenterX
        scatter3(center(1),center(2),Q(i1,i2));
     end
 end
-% surf(X,Y,Z);
+surf(X,Y,Z);
 
 % legend("RBF","Parabola");
 
+test = w'* NodeValue(index2state(1, 1));
+fprintf("netTest in (1,1) = %.6f; true val = %.6f\n", test, Q(1,1));
 
 end
 
