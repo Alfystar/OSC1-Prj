@@ -1,5 +1,5 @@
 clear variable
 clc
 
-
-interpolateMain();
+figure(1);
+interpolateMain(4,.8);

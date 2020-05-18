@@ -3,11 +3,11 @@ global nCenterX nCenterY beta;
 nCenterX = nX;
 nCenterY = nCenterX;
 global xMax yMax;
-xMax = 10;
-yMax = 10;
+xMax = 1;
+yMax = 1;
 beta = betaV;
 
-G = RBFMatrix ()
+G = RBFMatrix ();
 
 % Creo La Q campionando la funzione x^+y^2 per ogni x e y tra 0 e nCenter
 Q = zeros(nCenterX,nCenterY);
@@ -49,15 +49,10 @@ Z = X.^2 + Y.^2;
 
 surf(X,Y,RBFint);
 hold on
-for i1 = 1 : nCenterX
-    for i2 = 1 : nCenterY
-       [center] = index2state(i1, i2);
-       scatter3(center(1),center(2),Q(i1,i2));
-    end
-end
-% surf(X,Y,Z);
+plot()
+surf(X,Y,Z);
 
-% legend("RBF","Parabola");
+legend("RBF","Parabola");
 
 
 end
