@@ -3,13 +3,15 @@ global nCenterX nCenterY beta;
 nCenterX = nX;
 nCenterY = nCenterX;
 global xMax xmin yMax ymin;
-xMax = 10;
-xmin = -10;
+xMax = 100;
+xmin = -100;
 
-yMax = 10;
-ymin = -10;
+yMax = 100;
+ymin = -100;
 beta = betaV;
 
+fprintf("Inizio Calcolo della G,b,w\n")
+tic;
 G = RBFMatrix ();
 
 % Creo La Q campionando la funzione x^+y^2 per ogni x e y tra 0 e nCenter
@@ -21,9 +23,9 @@ for i1 = 1 : nCenterX
     end
 end
 
-
+global w;
 [w] = interpolate (G,Q);
-
+fprintf("\tFine Calcolo della G,b,w , Time = %.5fs\n",toc)
 
 clf
 
@@ -36,23 +38,27 @@ y = [ymin:step:yMax];
 
 RBFint = zeros(length(x), length(y));
 
+fprintf("Inizio Calcolo della RBFint\n")
+tic;
+
 % Calcolo i valori interpolati
 for i = 1 : length(x)
     for j= 1 : length(y)
-        [rho] = NodeValue(scalar2vect(x(i),y(j)));
 %       Notazione matlab per la tabella: (y,x)
 %       M(:,1) Prendo la prima colonna (ovvero le y)
 %       M(1,:) Prendo la prima riga (ovvero le x)
-        RBFint(j, i) = rho'*w;
+        RBFint(i,j) = NetworkInterpolate(scalar2vect(x(i),y(j)));
     end
 end
 
+fprintf("\tFinito Calcolo della RBFint, Time = %.5fs\n",toc)
+tic
 % Calcolo la parabola punto per punto
 Z = f(X,Y);
 
-
-% subplot(2,1,1)
 surf(X,Y,RBFint);
+colormap autumn
+
 hold on
 for i1 = 1 : nCenterX
     for i2 = 1 : nCenterY
@@ -60,21 +66,56 @@ for i1 = 1 : nCenterX
        scatter3(center(1),center(2),Q(i1,i2));
     end
 end
-% title("RBF interpolation");
-% subplot(2,1,2)
-surf(X,Y,Z);
-% title("F");
 
-test = w'* NodeValue(index2state(1, 1));
-fprintf("netTest in (1,1) = %.6f; true val = %.6f\n", test, Q(1,1));
+surf(X,Y,Z,'FaceColor','g','FaceAlpha',0.15,'EdgeColor','none');
+legend("RBF", "RBF center","F");
+fprintf("END of Plotting Time = %.5fs\n",toc)
 
 end
 
+function [val] = NetworkInterpolate(state)
+global w beta;
+
+% Calcola OGNI NODO anche quelli distanti
+% [rho] = NodeValue(state);
+% val = rho'*w;     
+
+% Calcolo un sotto insieme
+[list] = nearCenter(state,4);
+
+[~, nPoint] = size(list);
+val = 0;
+% rho=zeros(nPoint,1);
+for i = 1 : nPoint
+    rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
+    [index] = indexCenter(list(1,i),list(2,i));
+    val = val + rho * w(index);
+end
+
+
+end
+
+% Ritorna una lista dove ogni COLONNA è una coppia di indici
+% che sono vicini dello stato preso in esame di distanza 'dist'
+function [list] = nearCenter(stato,dist)
+global nCenterX nCenterY
+
+[i1, i2] = state2index(stato(1),stato(2));
+list=[];
+for i=i1-dist : i1+dist
+    for j=i2-dist : i2+dist
+    if(i>=1 && i<=nCenterX && j>=1 && j<=nCenterY)
+        list = [list [i;j]];
+    end
+    end
+end
+end
 
 function [val] = f(x,y)
-%     val = x.^2+y.^2;  %Parabola
+val = x.^2+y.^2;  %Parabola
 %     val = sin(x);  %sinusoidale
-val = sin(x)+cos(y);  %sinusoidale
+% val = sin(x)+cos(y);  %sinusoidale
+% val = sin((x/10).^2)+cos((y/10).^2);  %sinusoidale
 %     val = 3*x+2*y;  %piano
     
 end
