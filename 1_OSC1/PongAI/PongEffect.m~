@@ -280,49 +280,6 @@ end
 % discretizzazione
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% TODO Mixare NodeValue e il metodo con la distanza per ottenere un calcolo
-% efficiente e rapidp
-function [ctr] = bestControll (state, Wdown, Wstill, Wup)
-coder.gpu.kernelfun
-rho = gpuArray(NodeValue (state));
-% Wdown = gpuArray(Wdown);
-% Wstill = gpuArray(Wstill);
-% Wup = gpuArray(Wup);
-
-% MAX di MAX da fare
-[~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
-ctr = I - 2;
-end
-
-% TODO Usare il metodo con la distanza
-function  [rho] = NodeValue (state)
-global Ln Hn V velSig;
-global beta;
-rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
-i=1;
-for i1 = 1 : Ln
-    for i2 = 1 : Hn
-        for i3 = 1 : length(V)
-            for i4 = 1 : velSig
-                for i5 = 1 : velSig
-                    [C1] = index2state(i1, i2, i3, i4 ,i5);
-                    rho(i) = exp(-beta*sum((C1-state).^2));
-                    i=i+1;
-                end
-            end
-        end
-    end
-end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % TODO Riscricere usando CENTRI ORDINATI
 function [G] = RBFMatrix ()
 global beta;
@@ -385,6 +342,41 @@ b = gpuArray( Bvector(Q) );
 w = G \ b ;
 end
 
+% TODO Mixare NodeValue e il metodo con la distanza per ottenere un calcolo
+% efficiente e rapidp
+function [ctr] = bestControll (state, Wdown, Wstill, Wup)
+coder.gpu.kernelfun
+rho = gpuArray(NodeValue (state));
+% Wdown = gpuArray(Wdown);
+% Wstill = gpuArray(Wstill);
+% Wup = gpuArray(Wup);
+
+% MAX di MAX da fare
+[~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
+ctr = I - 2;
+end
+
+% TODO Usare il metodo con la distanza
+function  [rho] = NodeValue (state)
+global Ln Hn V velSig;
+global beta;
+rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
+i=1;
+for i1 = 1 : Ln
+    for i2 = 1 : Hn
+        for i3 = 1 : length(V)
+            for i4 = 1 : velSig
+                for i5 = 1 : velSig
+                    [C1] = index2state(i1, i2, i3, i4 ,i5);
+                    rho(i) = exp(-beta*sum((C1-state).^2));
+                    i=i+1;
+                end
+            end
+        end
+    end
+end
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -427,64 +419,4 @@ center = [
     i4-2, ...     %VxBall center
     i5-2 ...      %VyBall center
     ];
-end
-
-%TODO adattare al problema 5D
-% Dati gli stati ottiene gli indici che li contengono
-function [i1, i2] = state2index(X,Y)
-global xMax xmin yMax ymin;
-global nCenterX nCenterY;
-% VxBall
-% VyBall
-i1 = min(max(1,ceil((X-xmin)/xMax * nCenterX)),nCenterX);
-i2 = min(max(1,ceil((Y-ymin)/yMax * nCenterY)),nCenterY);
-end
-
-%TODO adattare al problema 5D
-% Dati gli indici ritorna le coordinate dello stato
-function [center] = index2state(i1, i2)
-global xMax xmin yMax ymin;
-global nCenterX nCenterY;
-
-center = [
-    xmin + i1/nCenterX * abs(xMax-xmin), ...  %Xi center
-    ymin + i2/nCenterY * abs(yMax-ymin), ...  %Yi center
-    ];
-end
-
-%TODO adattare al problema 5D
-function [index] = indexCenter(i1,i2)
-global nCenterX nCenterY;
-
-    index = (i2-1) * nCenterX + i1;
-end
-
-%TODO adattare al problema 5D
-function [i1,i2] = centerIndex(index)
-global nCenterX nCenterY;
-    
-    i1 = mod(index,nCenterX);
-%     Perchè vado da 1 a n e non da 0 a n-1!!!! (matlab antipatico!!)
-    if(i1 == 0)
-        i1 = nCenterX;
-    end
-    i2 = (index - i1)/nCenterX + 1;
-%     fprintf("index = %d, i1 = %d, i2 = %d\n",index,i1,i2);
-    
-end
-
-% Ritorna una lista dove ogni COLONNA è una coppia di indici
-% che sono vicini dello stato preso in esame di distanza 'dist'
-function [list] = nearCenter(stato,dist)
-global nCenterX nCenterY
-
-[i1, i2] = state2index(stato(1),stato(2));
-list=[];
-for i=i1-dist : i1+dist
-    for j=i2-dist : i2+dist
-    if(i>=1 && i<=nCenterX && j>=1 && j<=nCenterY)
-        list = [list [i;j]];
-    end
-    end
-end
 end

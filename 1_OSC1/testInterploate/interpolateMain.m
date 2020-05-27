@@ -1,18 +1,20 @@
-function [] = interpolateMain(nX, betaV, Gstep)
+function [tG, tW, tRBFint, tplot] = interpolateMain(nX, betaV, Gstep,speed)
 global nCenterX nCenterY beta;
 nCenterX = nX;
 nCenterY = nCenterX;
 global xMax xmin yMax ymin;
-xMax = 100;
-xmin = -100;
+xMax = 10;
+xmin = -10;
 
-yMax = 100;
-ymin = -100;
+yMax = 10;
+ymin = -10;
 beta = betaV;
 
 fprintf("Inizio Calcolo della G,b,w\n")
 tic;
 G = RBFMatrix ();
+tG = toc;
+
 
 % Creo La Q campionando la funzione x^+y^2 per ogni x e y tra 0 e nCenter
 Q = zeros(nCenterX,nCenterY);
@@ -24,8 +26,17 @@ for i1 = 1 : nCenterX
 end
 
 global w;
+tic
 [w] = interpolate (G,Q);
-fprintf("\tFine Calcolo della G,b,w , Time = %.5fs\n",toc)
+if(speed == 2)
+    [~,I] = sort(w);
+    for i = 1:floor(length(w)*0.5)
+        w(I(i)) = 0;
+    end
+end
+
+tW = toc;
+fprintf("\tFine Calcolo della G,b,w\n")
 
 clf
 
@@ -47,11 +58,11 @@ for i = 1 : length(x)
 %       Notazione matlab per la tabella: (y,x)
 %       M(:,1) Prendo la prima colonna (ovvero le y)
 %       M(1,:) Prendo la prima riga (ovvero le x)
-        RBFint(i,j) = NetworkInterpolate(scalar2vect(x(i),y(j)));
+        RBFint(j,i) = NetworkInterpolate(scalar2vect(x(i),y(j)),speed);
     end
 end
-
-fprintf("\tFinito Calcolo della RBFint, Time = %.5fs\n",toc)
+tRBFint = toc;
+fprintf("\tFinito Calcolo della RBFint\n")
 tic
 % Calcolo la parabola punto per punto
 Z = f(X,Y);
@@ -69,30 +80,33 @@ end
 
 surf(X,Y,Z,'FaceColor','g','FaceAlpha',0.15,'EdgeColor','none');
 legend("RBF", "RBF center","F");
-fprintf("END of Plotting Time = %.5fs\n",toc)
+tplot = toc;
+fprintf("END of Plotting\n")
 
 end
 
-function [val] = NetworkInterpolate(state)
+function [val] = NetworkInterpolate(state,speed)
 global w beta;
-
-% Calcola OGNI NODO anche quelli distanti
-% [rho] = NodeValue(state);
-% val = rho'*w;     
-
-% Calcolo un sotto insieme
-[list] = nearCenter(state,4);
-
-[~, nPoint] = size(list);
 val = 0;
-% rho=zeros(nPoint,1);
-for i = 1 : nPoint
-    rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
-    [index] = indexCenter(list(1,i),list(2,i));
-    val = val + rho * w(index);
+switch(speed)
+    case {0,2}
+
+        [rho] = NodeValue(state);
+        val = rho'*w;
+        
+    case 1
+        % Calcolo un sotto insieme
+        [list] = nearCenter(state,4);
+        
+        [~, nPoint] = size(list);
+        val = 0;
+        rho=zeros(nPoint,1);
+        for i = 1 : nPoint
+            rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
+            [index] = indexCenter(list(1,i),list(2,i));
+            val = val + rho * w(index);
+        end    
 end
-
-
 end
 
 % Ritorna una lista dove ogni COLONNA è una coppia di indici
@@ -112,11 +126,11 @@ end
 end
 
 function [val] = f(x,y)
-val = x.^2+y.^2;  %Parabola
+% val = x.^2+y.^2;  %Parabola
 %     val = sin(x);  %sinusoidale
 % val = sin(x)+cos(y);  %sinusoidale
 % val = sin((x/10).^2)+cos((y/10).^2);  %sinusoidale
-%     val = 3*x+2*y;  %piano
+    val = 3*x+2*y;  %piano
     
 end
 
