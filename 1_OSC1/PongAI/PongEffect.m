@@ -320,94 +320,98 @@ end
 end
 
 
-% TODO Usare il metodo con i centri per costruitre il vettore rho
 function  [rho] = NodeValue (state)
 global Ln Hn V velSig;
 global beta;
 rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
-i=1;
-for i1 = 1 : Ln
-    for i2 = 1 : Hn
-        for i3 = 1 : length(V)
-            for i4 = 1 : velSig
-                for i5 = 1 : velSig
-                    [C1] = index2state(i1, i2, i3, i4 ,i5);
-                    rho(i) = exp(-beta*sum((C1-state).^2));
-                    i=i+1;
-                end
-            end
-        end
-    end
+% i=1;
+% for i1 = 1 : Ln
+%     for i2 = 1 : Hn
+%         for i3 = 1 : length(V)
+%             for i4 = 1 : velSig
+%                 for i5 = 1 : velSig
+%                     [C1] = index2state(i1, i2, i3, i4 ,i5);
+%                     rho(i) = exp(-beta*sum((C1-state).^2));
+%                     i=i+1;
+%                 end
+%             end
+%         end
+%     end
+% end
+for i = 1 : length(rho)
+    [i1, i2, i3, i4 ,i5] = id2Center (i);    %Trasformo l'ID, nelle sue coordinate
+    [C1] = index2state(i1, i2, i3, i4 ,i5);
+    rho(i) = exp(-beta*sum((C1-state).^2)); %le rho sono ordinate come la logica di centerId
+    
 end
 end
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO Riscricere usando CENTRI ORDINATI
+function [w] = interpolate (G,Q)
+b = gpuArray(Bvector(Q));
+% g = gpuArray( G ); % Fatto fuori per risparmiare passaggi
+w = G \ b ;
+end
+
 function [G] = RBFMatrix ()
 global beta;
 global Ln Hn V velSig;
 G = eye(Ln * Hn * length(V) * velSig * velSig);
-i = 1;
-for i1 = 1 : Ln
-    for i2 = 1 : Hn
-        for i3 = 1 : length(V)
-            for i4 = 1 : velSig
-                interpolatefor i5 = 1 : velSig
-                [C1] = index2state(i1, i2, i3, i4 ,i5);
-                j = i;
-                % In teoria G è simmetrica, e la diagonale è tutta di 1
-                for j1 = i1 : Ln
-                    for j2 = i2 : Hn
-                        for j3 = i3 : length(V)
-                            for j4 = i4 : velSig
-                                for j5 = i5 : velSig
-                                    [C2] = index2state(j1, j2, j3, j4 ,j5);
-                                    G(i,j) = exp(-beta*sum((C1-C2).^2));
-                                    G(j,i) = G(i,j);
-                                    j = j+1;
-                                end
-                            end
-                        end
-                    end
-                end
-                i = i+1;
-                
-            end
-        end
+% i = 1;
+% for i1 = 1 : Ln
+%     for i2 = 1 : Hn
+%         for i3 = 1 : length(V)
+%             for i4 = 1 : velSig
+%                 interpolatefor i5 = 1 : velSig
+%                 [C1] = index2state(i1, i2, i3, i4 ,i5);
+%                 j = i;
+%                 % In teoria G è simmetrica, e la diagonale è tutta di 1
+%                 for j1 = i1 : Ln
+%                     for j2 = i2 : Hn
+%                         for j3 = i3 : length(V)
+%                             for j4 = i4 : velSig
+%                                 for j5 = i5 : velSig
+%                                     [C2] = index2state(j1, j2, j3, j4 ,j5);
+%                                     G(i,j) = exp(-beta*sum((C1-C2).^2));
+%                                     G(j,i) = G(i,j);
+%                                     j = j+1;
+%                                 end
+%                             end
+%                         end
+%                     end
+%                 end
+%                 i = i+1;
+%                 
+%             end
+%         end
+%     end
+% end
+
+for i = 1 : length(g)
+    [i1,i2, i3, i4, i5] = center2Id(i);
+    [C1] = index2state(i1,i2, i3, i4, i5);
+    for j = 1 : length(g)
+        [j1,j2,j3,j4,j5] = id2Center(j);
+        [C2] = index2state(j1, j2, j3, j4, j5);
+%         fprintf("C_%d,%d - C_%d,%d = (%d-%d)[(%d,%d)(%d,%d)]\n",i1,i2,j1,j2,i,j,C1(1),C1(2),C2(1),C2(2));
+        G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
     end
 end
+
 end
 
-% TODO Riscricere usando CENTRI ORDINATI
 function [B] = Bvector (Q)
 global Ln Hn V velSig;
 B = zeros(Ln * Hn * length(V) * velSig * velSig,1);
-i=1;
-for i1 = 1 : Ln
-    for i2 = 1 : Hn
-        for i3 = 1 : length(V)
-            for i4 = 1 : velSig
-                for i5 = 1 : velSig
-                    B(i) = Q(i1, i2, i3, i4 ,i5);
-                    i=i+1;
-                end
-            end
-        end
-    end
-end
+
+for i = 1 : length(B)
+    [i1,i2, i3, i4, i5] = id2Center(i);
+    B(i) = Q(i1, i2, i3, i4 ,i5);
 end
 
-% TODO Usare il metodo con i centri per costruitre il vettore w
-function [w] = interpolate (G,Q)
-coder.gpu.kernelfun
-b = gpuArray( Bvector(Q) );
-% g = gpuArray( G ); % Fatto fuori per risparmiare passaggi
-w = G \ b ;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -456,14 +460,14 @@ end
 
 
 %TODO adattare al problema 5D
-function [id] = idCenter(i1,i2)
+function [id] = center2Id(i1,i2)
 global nCenterX nCenterY;
 
     index = (i2-1) * nCenterX + i1;
 end
 
 %TODO adattare al problema 5D
-function [i1,i2] = centerId(id)
+function [i1,i2] = id2Center(id)
 global nCenterX nCenterY;
     
     i1 = mod(index,nCenterX);
@@ -479,15 +483,33 @@ end
 % Ritorna una lista dove ogni COLONNA è una coppia di indici
 % che sono vicini dello stato preso in esame di distanza 'dist'
 function [list] = nearCenter(st,dist)
-global Ln Hn V;
+global Ln Hn V velSig;
+% Ln        Numero divisioni in X
+% Hn        Numero divisioni in Y
+% velSig:   2 Var, Vx e Vy, se 1 = neg, 2 = ~0 , 3 = pos, 
 
+% X1(Xball)  = Xpalla
+% X2(Yball)  = Ypalla
+% X3(Ybarr)  = ybarra
+% X4(VxBall) = 1 = neg, 2 = ~0 , 3 = pos
+% X5(VyBall) = 1 = neg, 2 = ~0 , 3 = pos
+% Indici i in base a Ln, Hn e Vn che indicano il livello di
+% discretizzazione
 [i1, i2, i3, i4 ,i5] = state2index(st(1),st(2),st(3),st(4),st(5));
 list=[];
-for i=i1-dist : i1+dist
-    for j=i2-dist : i2+dist
-    if(i>=1 && i<=nCenterX && j>=1 && j<=nCenterY)
-        list = [list [i;j]];
-    end
+for I1=i1-dist : i1+dist
+    for I2=i2-dist : i2+dist
+        for I3=i3-dist : i3+dist
+            for I4=i4-dist : i4+dist
+                for I5=i5-dist : i5+dist
+                    if((I1>=1 && I1<=Ln) && (I2>=1 && I2<=Hn) &&...
+                       (I3>=1 && I3<=length(V)) &&...
+                       (I4>=1 && I4<=velSig) && (I5>=1 && I5<=velSig))
+                        list = [list [I1;I2;I3;I4;I5]];
+                    end
+                end
+            end
+        end
     end
 end
 end

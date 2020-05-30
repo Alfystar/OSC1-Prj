@@ -4,10 +4,10 @@ clc
 
 
 global Ln Hn Vn velSig    % Settori Discretizzati
-Ln = 3;
-Hn = 3;
-Vn = 1;
-velSig = 3;             % 1 = neg, 2 = ~0 , 3 = pos
+Ln = 3;                 % Numero divisioni in X
+Hn = 3;                 % Numero divisioni in Y
+Vn = 1;                 % Distanza tra 2 coordinate della barra
+velSig = 3;             % 1 = neg, 2 = ~0 , 3 = pos, 2 Var, Vx e Vy
 
 global L H alpha gamma eps V
 L = 10;                  % profondità del campo
