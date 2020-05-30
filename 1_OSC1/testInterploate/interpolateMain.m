@@ -103,7 +103,7 @@ switch(speed)
         rho=zeros(nPoint,1);
         for i = 1 : nPoint
             rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
-            [index] = indexCenter(list(1,i),list(2,i));
+            [index] = idCenter(list(1,i),list(2,i));
             val = val + rho * w(index);
         end    
 end
@@ -140,10 +140,10 @@ G = eye(nCenterX * nCenterX);
 
 
 for i = 1 : nCenterX * nCenterY
-    [i1,i2] = centerIndex(i);
+    [i1,i2] = centerId(i);
     [C1] = index2state(i1, i2);
     for j = 1 : nCenterX * nCenterY
-        [j1,j2] = centerIndex(j);
+        [j1,j2] = centerId(j);
         [C2] = index2state(j1, j2);
 %         fprintf("C_%d,%d - C_%d,%d = (%d-%d)[(%d,%d)(%d,%d)]\n",i1,i2,j1,j2,i,j,C1(1),C1(2),C2(1),C2(2));
         G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
@@ -153,13 +153,13 @@ end
 
 end
 
-function [index] = indexCenter(i1,i2)
+function [index] = idCenter(i1,i2)
 global nCenterX nCenterY;
 
     index = (i2-1) * nCenterX + i1;
 end
 
-function [i1,i2] = centerIndex(index)
+function [i1,i2] = centerId(index)
 global nCenterX nCenterY;
     
     i1 = mod(index,nCenterX);

@@ -284,21 +284,43 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO Mixare NodeValue e il metodo con la distanza per ottenere un calcolo
-% efficiente e rapidp
-function [ctr] = bestControll (state, Wdown, Wstill, Wup)
-coder.gpu.kernelfun
-rho = gpuArray(NodeValue (state));
-% Wdown = gpuArray(Wdown);
-% Wstill = gpuArray(Wstill);
-% Wup = gpuArray(Wup);
+% mode = 0: Interpolazione totale, 1: Interpolazione con vicini di distanza 4
+function [ctr] = bestControll (state, Wdown, Wstill, Wup, mode)
+ctr = 0;
+w = [Wdown, Wstill, Wup];
+switch(mode)
+    case {0}
 
-% MAX di MAX da fare
-[~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
-ctr = I - 2;
+        rho = gpuArray(NodeValue (state));
+        % Wdown = gpuArray(Wdown);
+        % Wstill = gpuArray(Wstill);
+        % Wup = gpuArray(Wup);
+        
+        % MAX di MAX da fare
+        [~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
+        ctr = I - 2;
+        
+    case 1        % Calcolo un sotto insieme di distanza 4
+        [list] = nearCenter(state,4);
+        [~, nPoint] = size(list);
+        netVal = zeros(1,length(w));
+        for i = 1 : nPoint
+%             Creo il vettore rho ristretto
+            rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
+%             Creo 3 vettori netVal per il confronto, da confrontare in seguito
+            for j = 1 : length(w)
+                [index] = indexCenter(list(1,i),list(2,i));
+                netVal(j) = netVal(j) + rho * w(j,index);   %w(quale w, quale centro)
+            end 
+        end
+        [~,I] = max(netVal);
+        ctr = I - 2;        
 end
 
-% TODO Usare il metodo con la distanza
+end
+
+
+% TODO Usare il metodo con i centri per costruitre il vettore rho
 function  [rho] = NodeValue (state)
 global Ln Hn V velSig;
 global beta;
@@ -318,6 +340,8 @@ for i1 = 1 : Ln
     end
 end
 end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -378,6 +402,7 @@ for i1 = 1 : Ln
 end
 end
 
+% TODO Usare il metodo con i centri per costruitre il vettore w
 function [w] = interpolate (G,Q)
 coder.gpu.kernelfun
 b = gpuArray( Bvector(Q) );
@@ -429,38 +454,16 @@ center = [
     ];
 end
 
-%TODO adattare al problema 5D
-% Dati gli stati ottiene gli indici che li contengono
-function [i1, i2] = state2index(X,Y)
-global xMax xmin yMax ymin;
-global nCenterX nCenterY;
-% VxBall
-% VyBall
-i1 = min(max(1,ceil((X-xmin)/xMax * nCenterX)),nCenterX);
-i2 = min(max(1,ceil((Y-ymin)/yMax * nCenterY)),nCenterY);
-end
 
 %TODO adattare al problema 5D
-% Dati gli indici ritorna le coordinate dello stato
-function [center] = index2state(i1, i2)
-global xMax xmin yMax ymin;
-global nCenterX nCenterY;
-
-center = [
-    xmin + i1/nCenterX * abs(xMax-xmin), ...  %Xi center
-    ymin + i2/nCenterY * abs(yMax-ymin), ...  %Yi center
-    ];
-end
-
-%TODO adattare al problema 5D
-function [index] = indexCenter(i1,i2)
+function [id] = idCenter(i1,i2)
 global nCenterX nCenterY;
 
     index = (i2-1) * nCenterX + i1;
 end
 
 %TODO adattare al problema 5D
-function [i1,i2] = centerIndex(index)
+function [i1,i2] = centerId(id)
 global nCenterX nCenterY;
     
     i1 = mod(index,nCenterX);
@@ -475,10 +478,10 @@ end
 
 % Ritorna una lista dove ogni COLONNA è una coppia di indici
 % che sono vicini dello stato preso in esame di distanza 'dist'
-function [list] = nearCenter(stato,dist)
-global nCenterX nCenterY
+function [list] = nearCenter(st,dist)
+global Ln Hn V;
 
-[i1, i2] = state2index(stato(1),stato(2));
+[i1, i2, i3, i4 ,i5] = state2index(st(1),st(2),st(3),st(4),st(5));
 list=[];
 for i=i1-dist : i1+dist
     for j=i2-dist : i2+dist
