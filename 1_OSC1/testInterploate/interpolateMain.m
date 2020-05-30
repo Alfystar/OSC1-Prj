@@ -134,19 +134,37 @@ function [val] = f(x,y)
     
 end
 
+% function [G] = RBFMatrix ()
+% global nCenterX nCenterY beta;
+% [G, I] = deal( eye(nCenterX * nCenterX) );
+% 
+% for i = 1 : (nCenterX * nCenterY -1)
+%     [i1,i2] = centerId(i);
+%     [C1] = index2state(i1, i2);
+%     for j = (1+i) : nCenterX * nCenterY
+%         [j1,j2] = centerId(j);
+%         [C2] = index2state(j1, j2);
+%          G(i,j) = exp(-beta*norm(C1-C2));
+%     end
+% end
+% 
+% G = G + G' - I;
+% % G = gpuArray(G);
+% 
+% end
+
 function [G] = RBFMatrix ()
 global nCenterX nCenterY beta;
+
 G = eye(nCenterX * nCenterX);
 
-
-for i = 1 : nCenterX * nCenterY
+for i = 1 : (nCenterX * nCenterY)
     [i1,i2] = centerId(i);
     [C1] = index2state(i1, i2);
     for j = 1 : nCenterX * nCenterY
         [j1,j2] = centerId(j);
         [C2] = index2state(j1, j2);
-%         fprintf("C_%d,%d - C_%d,%d = (%d-%d)[(%d,%d)(%d,%d)]\n",i1,i2,j1,j2,i,j,C1(1),C1(2),C2(1),C2(2));
-        G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
+         G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
     end
 end
 % G = gpuArray(G);
