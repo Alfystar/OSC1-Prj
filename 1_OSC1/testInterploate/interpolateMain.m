@@ -16,6 +16,8 @@ G = RBFMatrix ();
 tG = toc;
 
 
+
+
 % Creo La Q campionando la funzione x^+y^2 per ogni x e y tra 0 e nCenter
 Q = zeros(nCenterX,nCenterY);
 for i1 = 1 : nCenterX
@@ -172,6 +174,7 @@ end
 % % G = gpuArray(G);
 % 
 % end
+
 
 function [index] = idCenter(i1,i2)
 global nCenterX nCenterY;
