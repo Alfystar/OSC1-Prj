@@ -1,4 +1,8 @@
 % Funzione che permette di eseguire una partita
+% figOnOff: 1 disegna la partita, 0 la esegue soltanto
+% SBROnOff: 1 attiva la rete RBF, 0 usa il classico RL
+% SBRspeedOnOff (utile solo se SBROnOff=1) : 1 Calcolo rapido prendendo
+%                       pochi centri vicini, 0 Calcolo totale con tutti i centri
 function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, SBROnOff,SBRspeedOnOff)
 
 
@@ -68,12 +72,8 @@ flagFirst = 1;
 maxiter = 10000;
 score = 0;
 
-G = RBFMatrix ();
-G = gpuArray( G );
-
-% Wup = G\Bvector(Qup);
-% Wstill = G\Bvector(Qstill);
-% Wdown = G\Bvector(Qdown);
+G = RBFMatrix ();   % Già GPU Array
+% G = (G);
 
 Wup = interpolate(G,Qup);
 Wstill = interpolate(G,Qstill);
@@ -111,11 +111,8 @@ while xb > 0 && counter < maxiter
         pause(0.001)
     end
     
-    
-    
-    
+        
     [i1, i2, i3, i4 ,i5] = state2index(xb,yb,ys,vx,vy);
-    
     
     
     % aggiorniamo la posizione della pallina
@@ -192,8 +189,6 @@ while xb > 0 && counter < maxiter
             ctr = 0;
         end
     end
-    
-    
     
     
     % aggiorniamo lo stato della barretta
@@ -285,30 +280,29 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % mode = 0: Interpolazione totale, 1: Interpolazione con vicini di distanza 4
+% si Aspetta Wdown, Wstill, Wup come 
 function [ctr] = bestControll (state, Wdown, Wstill, Wup, mode)
 global beta;
 ctr = 0;
-w = [Wdown, Wstill, Wup];
 switch(mode)
     case {0}
         
-        rho = gpuArray(NodeValue (state));
-        % Wdown = gpuArray(Wdown);
-        % Wstill = gpuArray(Wstill);
-        % Wup = gpuArray(Wup);
+        rho = NodeValue (state);
         
         % MAX di MAX da fare
         [~,I] = max([Wdown'*rho,Wstill'*rho,Wup'*rho]);
         ctr = I - 2;
         
     case 1        % Calcolo un sotto insieme di distanza 4
+        w = [Wdown, Wstill, Wup];
         [list] = nearCenter(state,1);
         [~, nPoint] = size(list);
-        netVal = gpuArray(zeros(1,3));
+        netVal = (zeros(1,3));
         for i = 1 : nPoint
-            %             Creo il vettore rho ristretto
-            rho = exp(-beta*(sum((index2state(list(1,i),list(2,i),list(3,i),list(4,i),list(5,i))-state).^2))^0.5);
-            %             Creo 3 vettori netVal per il confronto, da confrontare in seguito
+            % Creo il vettore rho ristretto
+            C = index2state(list(1,i),list(2,i),list(3,i),list(4,i),list(5,i));
+            rho = exp(-beta*(norm(C-state)));
+            %  Creo 3 vettori netVal per il confronto, da confrontare in seguito
             for j = 1 : 3
                 [id] = coord2Id(list(1,j),list(2,j),list(3,j),list(4,j),list(5,j));
                 netVal(j) = netVal(j) + rho * w(id,j);   %w(quale w, quale centro)
@@ -320,11 +314,11 @@ end
 
 end
 
-
+% Ritorna un vettore 
 function  [rho] = NodeValue (state)
 global Ln Hn V velSig;
 global beta;
-rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
+rho = (zeros(Ln * Hn * length(V) * velSig * velSig, 1));
 
 for i = 1 : length(rho)
     [i1, i2, i3, i4 ,i5] = id2Coord (i);    %Trasformo l'ID, nelle sue coordinate
@@ -338,16 +332,17 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Si aspetta G come  e Q come una matrice normale 
 function [w] = interpolate (G,Q)
-b = gpuArray(Bvector(Q));
-% g = gpuArray( G ); % Fatto fuori per risparmiare passaggi
+b = Bvector(Q);
+% g = ( G ); % Fatto fuori per risparmiare passaggi
 w = G \ b ;
 end
 
 function [G] = RBFMatrix ()
 global beta;
 global Ln Hn V velSig;
-[G,I] = deal(eye(Ln * Hn * length(V) * velSig * velSig));
+[G,I] = deal((eye(Ln * Hn * length(V) * velSig * velSig)));
 for i = 1 : length(G)-1
     [i1,i2, i3, i4, i5] = id2Coord(i);
     [C1] = index2state(i1,i2, i3, i4, i5);
@@ -363,9 +358,10 @@ G = G + G' - I;
 
 end
 
+% Si aspetta una matrice Q, e ritorna una B in 
 function [B] = Bvector (Q)
 global Ln Hn V velSig;
-B = zeros(Ln * Hn * length(V) * velSig * velSig,1);
+B = (zeros(Ln * Hn * length(V) * velSig * velSig,1));
 
 for i = 1 : length(B)
     [i1,i2, i3, i4, i5] = id2Coord(i);

@@ -70,7 +70,7 @@ while(1)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0, 1,0);
+        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0, 1,1);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
