@@ -131,8 +131,8 @@ function [val] = f(x,y)
 % val = x.^2+y.^2;  %Parabola
 % val = sin(x);  %sinusoidale
 % val = sin(x)+cos(y);  %sinusoidale
-% val = sin((x/10).^2)+cos((y/10).^2);  %sinusoidale
-val = 3*x+2*y;  %piano
+val = sin((x/10).^2)+cos((y/10).^2);  %sinusoidale
+% val = 3*x+2*y;  %piano
 
 end
 
@@ -156,41 +156,21 @@ G = G + G' - I;
 
 end
 
-% % funzione base, con scorrimento totale 
-%function [G] = RBFMatrix ()
-% global nCenterX nCenterY beta;
-% 
-% G = eye(nCenterX * nCenterX);
-% 
-% for i = 1 : (nCenterX * nCenterY)
-%     [i1,i2] = centerId(i);
-%     [C1] = index2state(i1, i2);
-%     for j = 1 : nCenterX * nCenterY
-%         [j1,j2] = centerId(j);
-%         [C2] = index2state(j1, j2);
-%         G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
-%     end
-% end
-% % G = gpuArray(G);
-% 
-% end
-
-
-function [index] = idCenter(i1,i2)
+function [id] = idCenter(i1,i2)
 global nCenterX nCenterY;
 
-index = (i2-1) * nCenterX + i1;
+id = (i2-1) * nCenterX + i1;
 end
 
-function [i1,i2] = centerId(index)
+function [i1,i2] = centerId(id)
 global nCenterX nCenterY;
 
-i1 = mod(index,nCenterX);
+i1 = mod(id,nCenterX);
 %     Perchè vado da 1 a n e non da 0 a n-1!!!! (matlab antipatico!!)
 if(i1 == 0)
     i1 = nCenterX;
 end
-i2 = (index - i1)/nCenterX + 1;
+i2 = (id - i1)/nCenterX + 1;
 %     fprintf("index = %d, i1 = %d, i2 = %d\n",index,i1,i2);
 
 end
@@ -211,12 +191,16 @@ global nCenterX nCenterY;
 
 B = zeros(nCenterX * nCenterY,1);
 i=1;
-for i1 = 1 : nCenterX
-    for i2 = 1 : nCenterY
-        %         fprintf("F(C_%d,%d) = %d\n",i1,i2,i);
-        B(i) = points(i1, i2);
-        i=i+1;
-    end
+% for i1 = 1 : nCenterX
+%     for i2 = 1 : nCenterY
+%         %         fprintf("F(C_%d,%d) = %d\n",i1,i2,i);
+%         B(i) = points(i1, i2);
+%         i=i+1;
+%     end
+% end
+for i = 1:length(B)
+    [i1,i2] = centerId(i);
+    B(i) = points(i1, i2);
 end
 end
 
@@ -224,20 +208,23 @@ function  [rho] = NodeValue (state)
 global nCenterX nCenterY beta;
 
 rho = zeros(nCenterX * nCenterY, 1);
-i=1;
-for i1 = 1 : nCenterX
-    for i2 = 1 : nCenterY
-        [C1] = index2state(i1, i2);
-        rho(i) = exp(-beta*(sum((C1-state).^2))^0.5);
-        i=i+1;
-        
-    end
+% i=1;
+% for i1 = 1 : nCenterX
+%     for i2 = 1 : nCenterY
+%         [C1] = index2state(i1, i2);
+%         rho(i) = exp(-beta*(sum((C1-state).^2))^0.5);
+%         i=i+1;
+%         
+%     end
+% end
+for i = 1:length(rho)
+    [i1,i2] = centerId(i);
+    [C1] = index2state(i1, i2);
+    rho(i) = exp(-beta*(sum((C1-state).^2))^0.5);
 end
 % rho = gpuArray( rho );
 
 end
-
-
 
 function [state] = scalar2vect(X,Y)
 state = [X,Y];

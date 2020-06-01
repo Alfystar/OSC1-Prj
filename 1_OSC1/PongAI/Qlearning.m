@@ -50,6 +50,7 @@ alpha = 1;            % Peso nuova esperienza
 eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
 
 %%
+clc
 chk = -1;
 ite = 10;
 
@@ -69,12 +70,12 @@ while(1)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0, 1);
+        [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0, 1,0);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
         rimbalziTot = rimbalziTot + rimbalzi;
-        i = i+1;
+        i = i+1
         
     end
     %[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
@@ -134,13 +135,13 @@ for i =i/Hn*L 1:L+1
 end
 
 %%
+clc
 epsOld = eps;
-eps=0;
+eps = 0;
 xRnd = rand; yRnd = rand; bRnd = rand;
 xb0 = L*xRnd;
 yb0 = H*yRnd;
 yp0 = (H-1)*bRnd+1;
-
 [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,1);
-eps =epsOld;
+eps = epsOld;
 

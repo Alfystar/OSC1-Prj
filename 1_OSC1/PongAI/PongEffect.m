@@ -1,5 +1,5 @@
 % Funzione che permette di eseguire una partita
-function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, SBROnOff)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, SBROnOff,SBRspeedOnOff)
 
 
 global L H alpha gamma eps V
@@ -170,7 +170,7 @@ while xb > 0 && counter < maxiter
             end
         end
         if (SBROnOff == 1 ) % procedo con SBR
-            [ctr] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup);
+            [ctr] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup,SBRspeedOnOff);
             if ctr == 1 && (ys+Lb <= H-vb)
                 ys = ys+vb;
             elseif ctr == -1 && (ys-Lb >= vb)
@@ -215,7 +215,7 @@ while xb > 0 && counter < maxiter
     end
     
     if (SBROnOff == 1 ) % procedo con SBR
-        [ctrN] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup);
+        [ctrN] = bestControll (scalar2vect(xb,yb,ys,vx,vy), Wdown, Wstill, Wup,SBRspeedOnOff);
         if ctrN == 1 && ~(ys+Lb <= H-vb)
             ctrN = 0;
         elseif ctrN == -1 && ~(ys-Lb >= vb)
@@ -286,11 +286,12 @@ end
 
 % mode = 0: Interpolazione totale, 1: Interpolazione con vicini di distanza 4
 function [ctr] = bestControll (state, Wdown, Wstill, Wup, mode)
+global beta;
 ctr = 0;
 w = [Wdown, Wstill, Wup];
 switch(mode)
     case {0}
-
+        
         rho = gpuArray(NodeValue (state));
         % Wdown = gpuArray(Wdown);
         % Wstill = gpuArray(Wstill);
@@ -301,20 +302,20 @@ switch(mode)
         ctr = I - 2;
         
     case 1        % Calcolo un sotto insieme di distanza 4
-        [list] = nearCenter(state,4);
+        [list] = nearCenter(state,1);
         [~, nPoint] = size(list);
-        netVal = zeros(1,length(w));
+        netVal = gpuArray(zeros(1,3));
         for i = 1 : nPoint
-%             Creo il vettore rho ristretto
-            rho = exp(-beta*(sum((index2state(list(1,i),list(2,i))-state).^2))^0.5);
-%             Creo 3 vettori netVal per il confronto, da confrontare in seguito
-            for j = 1 : length(w)
-                [index] = indexCenter(list(1,i),list(2,i));
-                netVal(j) = netVal(j) + rho * w(j,index);   %w(quale w, quale centro)
-            end 
+            %             Creo il vettore rho ristretto
+            rho = exp(-beta*(sum((index2state(list(1,i),list(2,i),list(3,i),list(4,i),list(5,i))-state).^2))^0.5);
+            %             Creo 3 vettori netVal per il confronto, da confrontare in seguito
+            for j = 1 : 3
+                [id] = coord2Id(list(1,j),list(2,j),list(3,j),list(4,j),list(5,j));
+                netVal(j) = netVal(j) + rho * w(id,j);   %w(quale w, quale centro)
+            end
         end
         [~,I] = max(netVal);
-        ctr = I - 2;        
+        ctr = I - 2;
 end
 
 end
@@ -324,22 +325,9 @@ function  [rho] = NodeValue (state)
 global Ln Hn V velSig;
 global beta;
 rho = zeros(Ln * Hn * length(V) * velSig * velSig, 1);
-% i=1;
-% for i1 = 1 : Ln
-%     for i2 = 1 : Hn
-%         for i3 = 1 : length(V)
-%             for i4 = 1 : velSig
-%                 for i5 = 1 : velSig
-%                     [C1] = index2state(i1, i2, i3, i4 ,i5);
-%                     rho(i) = exp(-beta*sum((C1-state).^2));
-%                     i=i+1;
-%                 end
-%             end
-%         end
-%     end
-% end
+
 for i = 1 : length(rho)
-    [i1, i2, i3, i4 ,i5] = id2Center (i);    %Trasformo l'ID, nelle sue coordinate
+    [i1, i2, i3, i4 ,i5] = id2Coord (i);    %Trasformo l'ID, nelle sue coordinate
     [C1] = index2state(i1, i2, i3, i4 ,i5);
     rho(i) = exp(-beta*sum((C1-state).^2)); %le rho sono ordinate come la logica di centerId
     
@@ -359,47 +347,19 @@ end
 function [G] = RBFMatrix ()
 global beta;
 global Ln Hn V velSig;
-G = eye(Ln * Hn * length(V) * velSig * velSig);
-% i = 1;
-% for i1 = 1 : Ln
-%     for i2 = 1 : Hn
-%         for i3 = 1 : length(V)
-%             for i4 = 1 : velSig
-%                 interpolatefor i5 = 1 : velSig
-%                 [C1] = index2state(i1, i2, i3, i4 ,i5);
-%                 j = i;
-%                 % In teoria G è simmetrica, e la diagonale è tutta di 1
-%                 for j1 = i1 : Ln
-%                     for j2 = i2 : Hn
-%                         for j3 = i3 : length(V)
-%                             for j4 = i4 : velSig
-%                                 for j5 = i5 : velSig
-%                                     [C2] = index2state(j1, j2, j3, j4 ,j5);
-%                                     G(i,j) = exp(-beta*sum((C1-C2).^2));
-%                                     G(j,i) = G(i,j);
-%                                     j = j+1;
-%                                 end
-%                             end
-%                         end
-%                     end
-%                 end
-%                 i = i+1;
-%                 
-%             end
-%         end
-%     end
-% end
-
-for i = 1 : length(g)
-    [i1,i2, i3, i4, i5] = center2Id(i);
+[G,I] = deal(eye(Ln * Hn * length(V) * velSig * velSig));
+for i = 1 : length(G)-1
+    [i1,i2, i3, i4, i5] = id2Coord(i);
     [C1] = index2state(i1,i2, i3, i4, i5);
-    for j = 1 : length(g)
-        [j1,j2,j3,j4,j5] = id2Center(j);
+    for j = (1+i) : length(G)
+        [j1,j2,j3,j4,j5] = id2Coord(j);
         [C2] = index2state(j1, j2, j3, j4, j5);
-%         fprintf("C_%d,%d - C_%d,%d = (%d-%d)[(%d,%d)(%d,%d)]\n",i1,i2,j1,j2,i,j,C1(1),C1(2),C2(1),C2(2));
+        %         fprintf("C_%d,%d - C_%d,%d = (%d-%d)[(%d,%d)(%d,%d)]\n",i1,i2,j1,j2,i,j,C1(1),C1(2),C2(1),C2(2));
         G(i,j) = exp(-beta*(sum((C1-C2).^2))^0.5);
+        %         G(i,j) = exp(-beta*norm(C1-C2));
     end
 end
+G = G + G' - I;
 
 end
 
@@ -408,7 +368,7 @@ global Ln Hn V velSig;
 B = zeros(Ln * Hn * length(V) * velSig * velSig,1);
 
 for i = 1 : length(B)
-    [i1,i2, i3, i4, i5] = id2Center(i);
+    [i1,i2, i3, i4, i5] = id2Coord(i);
     B(i) = Q(i1, i2, i3, i4 ,i5);
 end
 
@@ -459,25 +419,52 @@ center = [
 end
 
 
-%TODO adattare al problema 5D
-function [id] = center2Id(i1,i2)
-global nCenterX nCenterY;
+function [id] = coord2Id(i1,i2,i3,i4,i5)
+%Seguiamo l'algoritmo row-major
+%https://en.wikipedia.org/wiki/Row-_and_column-major_order
+global Ln Hn V velSig;
 
-    index = (i2-1) * nCenterX + i1;
+if (i1>Ln || i2>Hn || i3>length(V) || i4>velSig || i5>velSig)
+    fprintf("[idCenter]\t\t### index out of range ###\n")
 end
 
-%TODO adattare al problema 5D
-function [i1,i2] = id2Center(id)
-global nCenterX nCenterY;
-    
-    i1 = mod(index,nCenterX);
-%     Perchè vado da 1 a n e non da 0 a n-1!!!! (matlab antipatico!!)
-    if(i1 == 0)
-        i1 = nCenterX;
-    end
-    i2 = (index - i1)/nCenterX + 1;
-%     fprintf("index = %d, i1 = %d, i2 = %d\n",index,i1,i2);
-    
+%id=id0+1.....il +1 serve per avere da 1 a n anche se dal punto di vista
+%matematico si vuole che sia da 0 a n-1
+
+id = i5 + velSig * ((i4-1) + velSig * ((i3-1) + length(V) * ((i2-1) + Hn * (i1-1))));
+
+
+end
+
+function [i1,i2,i3,i4,i5] = id2Coord(id)
+%Seguiamo l'algoritmo row-major
+%https://en.wikipedia.org/wiki/Row-_and_column-major_order
+global Ln Hn V velSig;
+
+if (id>(velSig^2*length(V)*Hn*Ln))
+    fprintf("[centerId]\t\t### index out of range ###\n")
+end
+
+i5max = velSig;
+i4max = velSig;
+i3max = length(V);
+i2max = Hn;
+i1max = Ln;
+N=[i5max; i4max; i3max; i2max; i1max];
+I=zeros(1,length(N));
+
+id0=id-1; %effettuiamo lo spostamento dalla mentalità di Matlab a quella matematica
+for j=1:length(N)
+    I(j)=mod(id0,N(j));
+    id0= (id0-I(j))/N(j);
+end
+
+i5=I(1)+1;
+i4=I(2)+1;
+i3=I(3)+1;
+i2=I(4)+1;
+i1=I(5)+1;
+
 end
 
 % Ritorna una lista dove ogni COLONNA è una coppia di indici
@@ -486,7 +473,7 @@ function [list] = nearCenter(st,dist)
 global Ln Hn V velSig;
 % Ln        Numero divisioni in X
 % Hn        Numero divisioni in Y
-% velSig:   2 Var, Vx e Vy, se 1 = neg, 2 = ~0 , 3 = pos, 
+% velSig:   2 Var, Vx e Vy, se 1 = neg, 2 = ~0 , 3 = pos,
 
 % X1(Xball)  = Xpalla
 % X2(Yball)  = Ypalla
@@ -503,8 +490,8 @@ for I1=i1-dist : i1+dist
             for I4=i4-dist : i4+dist
                 for I5=i5-dist : i5+dist
                     if((I1>=1 && I1<=Ln) && (I2>=1 && I2<=Hn) &&...
-                       (I3>=1 && I3<=length(V)) &&...
-                       (I4>=1 && I4<=velSig) && (I5>=1 && I5<=velSig))
+                            (I3>=1 && I3<=length(V)) &&...
+                            (I4>=1 && I4<=velSig) && (I5>=1 && I5<=velSig))
                         list = [list [I1;I2;I3;I4;I5]];
                     end
                 end
