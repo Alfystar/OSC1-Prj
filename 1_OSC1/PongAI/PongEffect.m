@@ -45,13 +45,13 @@ if Figura == 1
     hT1.LineWidth = 6;
     
     for i = 1 : Ln
-        l = line([0 L],[i/Ln*H,i/Ln*H]);
+        l = line([i/Ln*L,i/Ln*L],[0,H]);
         l.Color = [0,0,0];
         l.LineWidth = 1;
     end
     
     for i = 1 : Hn
-        l = line([i/Hn*L i/Hn*L],[0,H]);
+        l = line([0 L],[i/Hn*H i/Hn*H]);
         l.Color = [0,0,0];
         l.LineWidth = 1;
     end
@@ -69,12 +69,12 @@ vx = 0.1; vy = 0.1;                               % velocità iniziale arbitraria
 vb = 0.2;                                         % velocità della barretta COSTANTE
 
 flagFirst = 1;
-maxiter = 10000;
+maxiter = 100;
 score = 0;
 
 if G == 0       % Per evitare di ricalcolare sempre G che non cambia mai
-G = RBFMatrix ();   % Già GPU Array
-% G = (G);
+    G = RBFMatrix ();   % Già GPU Array
+    % G = (G);
 end
 
 Wup = interpolate(G,Qup);
@@ -113,7 +113,7 @@ while xb > 0 && counter < maxiter
         pause(0.001)
     end
     
-        
+    
     [i1, i2, i3, i4 ,i5] = state2index(xb,yb,ys,vx,vy);
     
     
@@ -227,31 +227,49 @@ while xb > 0 && counter < maxiter
     % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
     if ctr == 1 && ctrN == 1
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        %         Wup = interpolate(G,Qup);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wup = interpolate(G,Qup);
+        end
     elseif ctr == 1 && ctrN == 0
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        %         Wup = interpolate(G,Qup);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wup = interpolate(G,Qup);
+        end
     elseif ctr == 1 && ctrN == -1
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        %         Wup = interpolate(G,Qup);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wup = interpolate(G,Qup);
+        end
     elseif ctr == 0 && ctrN == 1
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        %         Wstill = interpolate(G,Qstill);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wstill = interpolate(G,Qstill);
+        end
     elseif ctr == 0 && ctrN == 0
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        %         Wstill = interpolate(G,Qstill);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wstill = interpolate(G,Qstill);
+        end
     elseif ctr == 0 && ctrN == -1
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        %         Wstill = interpolate(G,Qstill);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wstill = interpolate(G,Qstill);
+        end
     elseif ctr == -1 && ctrN == 1
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        %         Wdown = interpolate(G,Qdown);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wdown = interpolate(G,Qdown);
+        end
     elseif ctr == -1 && ctrN == 0
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        %         Wdown = interpolate(G,Qdown);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            %         Wdown = interpolate(G,Qdown);
+        end
     elseif ctr == -1 && ctrN == -1
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        %         Wdown = interpolate(G,Qdown);
+        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wdown = interpolate(G,Qdown);
+        end
     end
     
     if Figura == 1
@@ -282,7 +300,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % mode = 0: Interpolazione totale, 1: Interpolazione con vicini di distanza 4
-% si Aspetta Wdown, Wstill, Wup come 
+% si Aspetta Wdown, Wstill, Wup come
 function [ctr] = bestControll (state, Wdown, Wstill, Wup, mode)
 global beta;
 ctr = 0;
@@ -316,7 +334,7 @@ end
 
 end
 
-% Ritorna un vettore 
+% Ritorna un vettore
 function  [rho] = NodeValue (state)
 global Ln Hn V velSig;
 global beta;
@@ -334,7 +352,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Si aspetta G come  e Q come una matrice normale 
+% Si aspetta G come  e Q come una matrice normale
 function [w] = interpolate (G,Q)
 b = Bvector(Q);
 % g = ( G ); % Fatto fuori per risparmiare passaggi
@@ -360,7 +378,7 @@ G = G + G' - I;
 
 end
 
-% Si aspetta una matrice Q, e ritorna una B in 
+% Si aspetta una matrice Q, e ritorna una B in
 function [B] = Bvector (Q)
 global Ln Hn V velSig;
 B = (zeros(Ln * Hn * length(V) * velSig * velSig,1));
