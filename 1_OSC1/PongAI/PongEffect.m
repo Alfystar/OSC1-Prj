@@ -3,7 +3,7 @@
 % SBROnOff: 1 attiva la rete RBF, 0 usa il classico RL
 % SBRspeedOnOff (utile solo se SBROnOff=1) : 1 Calcolo rapido prendendo
 %                       pochi centri vicini, 0 Calcolo totale con tutti i centri
-function [chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, SBROnOff,SBRspeedOnOff)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, G, SBROnOff,SBRspeedOnOff)
 
 
 global L H alpha gamma eps V
@@ -72,8 +72,10 @@ flagFirst = 1;
 maxiter = 10000;
 score = 0;
 
+if G == 0       % Per evitare di ricalcolare sempre G che non cambia mai
 G = RBFMatrix ();   % Già GPU Array
 % G = (G);
+end
 
 Wup = interpolate(G,Qup);
 Wstill = interpolate(G,Qstill);
@@ -199,7 +201,7 @@ while xb > 0 && counter < maxiter
     
     % aggiorniamo le funzioni Q
     % determiniamo la migliore azione per l'iterazione successiva
-    if (SBROnOff == 0 ) % procedo con SBR
+    if (SBROnOff == 0 ) % procedo con classica RL
         if Qup(i1n,i2n,i3n,i4n,i5n) >= Qdown(i1n,i2n,i3n,i4n,i5n) && Qup(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys+Lb <= H-vb)
             ctrN = 1;
         elseif Qdown(i1n,i2n,i3n,i4n,i5n) > Qup(i1n,i2n,i3n,i4n,i5n) && Qdown(i1n,i2n,i3n,i4n,i5n) >= Qstill(i1n,i2n,i3n,i4n,i5n) && (ys-Lb >= vb)
@@ -483,14 +485,12 @@ list=[];
 for I1=i1-dist : i1+dist
     for I2=i2-dist : i2+dist
         for I3=i3-dist : i3+dist
-            for I4=i4-dist : i4+dist
-                for I5=i5-dist : i5+dist
-                    if((I1>=1 && I1<=Ln) && (I2>=1 && I2<=Hn) &&...
-                            (I3>=1 && I3<=length(V)) &&...
-                            (I4>=1 && I4<=velSig) && (I5>=1 && I5<=velSig))
-                        list = [list [I1;I2;I3;I4;I5]];
-                    end
-                end
+            I4 = i4;
+            I5 = i5;
+            if((I1>=1 && I1<=Ln) && (I2>=1 && I2<=Hn) &&...
+                    (I3>=1 && I3<=length(V)) &&...
+                    (I4>=1 && I4<=velSig) && (I5>=1 && I5<=velSig))
+                list = [list [I1;I2;I3;I4;I5]];
             end
         end
     end
