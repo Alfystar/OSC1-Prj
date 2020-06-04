@@ -58,12 +58,16 @@ eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
 clc
 chk = -1;
 ite = 10;
-itePlot = 100;
-iSave = 10^4; 
+iteIbrid = 100;
+itePlot = 50;
+iSave = 10^3; 
+
+frameSpike = 500;
 
 G = 0;
 a = 1/2^6;
 b = 1/2^10;
+plays = 0;
 while(i <= 10^6)
     %     break;      %Commentare per proseguire addestramento
     
@@ -79,38 +83,35 @@ while(i <= 10^6)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,1,1);
+        if(plays<=5)
+            [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,1,0);
+        else
+            [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,0,0);
+        end
+        
+        plays = plays+1;
+        plays = mod(plays,frameSpike);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
         rimbalziTot = rimbalziTot + rimbalzi;
-        i = i+1;
+        alpha = alpha - (0.9/frameSpike);
         fprintf("|%d",i);
+        i = i+1;
     end
     fprintf("\n");
-    %[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
-    eps = eps*0.9995;
-    alpha = alpha*0.99995;
-    gamma = gamma *1.0005;
-    if(gamma >=0.85)
-        gamma = 0.85;
-    end
-    
     scorePlotmed(plotMed) = scoreTot/j;
     rimbalziPlotmed(plotMed) = rimbalziTot/j;
     scorePlotFilter(plotMed) = scorePlotFilter(plotMed-1)*(1-a) + scorePlotmed(plotMed)*a;
     rimbalziPlotFilter(plotMed) = rimbalziPlotFilter(plotMed-1)*(1-b) + rimbalziPlotmed(plotMed)*b;
     plotMed = plotMed+1;
-
     
     if(mod(plotMed,itePlot)==0)
         statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
     end
     
-    iSave = iSave - 1;
-    if(iSave == 0)
-        iSave = 10^4;
-        save("RBF_trunk_backup.mat")
+    if(mod(plotMed,iSave) == 0)
+        save("Ibrid_backup.mat")
     end
     
     fprintf("Iterazione %d, scoreMed = %f, rimbalsiMed = %f\n",i,scoreTot/j, rimbalziTot/j);
@@ -120,6 +121,18 @@ while(i <= 10^6)
     fprintf("Qstill %d\n", ~isequal(Qstill,QstillOld));
     fprintf("eps = %.3f\talpha= %.3f\tgamma = %.3f\t\n", eps, alpha, gamma);
     fprintf("\n");
+    
+    
+
+    eps = eps*0.9995;
+    if(alpha <=1/frameSpike)
+        alpha = 1;
+    end
+    gamma = gamma *1.0005;
+    if(gamma >=0.85)
+        gamma = 0.85;
+    end
+    
 end
 
 %%

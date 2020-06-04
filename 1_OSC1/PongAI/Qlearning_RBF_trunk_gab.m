@@ -58,7 +58,7 @@ eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
 clc
 chk = -1;
 ite = 10;
-itePlot = 100;
+itePlot = 10;
 iSave = 10^4; 
 
 G = 0;
@@ -79,13 +79,13 @@ while(i <= 10^6)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,0,0);
+        [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,1,1);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
         rimbalziTot = rimbalziTot + rimbalzi;
-        i = i+1;
         fprintf("|%d",i);
+        i = i+1;
     end
     fprintf("\n");
     %[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
@@ -107,10 +107,8 @@ while(i <= 10^6)
         statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
     end
     
-    iSave = iSave - 1;
-    if(iSave == 0)
-        iSave = 10^4;
-        save("RL_backup.mat")
+    if(mod(plotMed,iSave) == 0)
+        save("RBF_trunk_backup.mat")
     end
     
     fprintf("Iterazione %d, scoreMed = %f, rimbalsiMed = %f\n",i,scoreTot/j, rimbalziTot/j);

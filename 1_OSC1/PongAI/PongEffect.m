@@ -227,47 +227,47 @@ while xb > 0 && counter < maxiter
     % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')
     if ctr == 1 && ctrN == 1
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wup = interpolate(G,Qup);
         end
     elseif ctr == 1 && ctrN == 0
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wup = interpolate(G,Qup);
         end
     elseif ctr == 1 && ctrN == -1
         Qup(i1,i2,i3,i4,i5) = Qup(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qup(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wup = interpolate(G,Qup);
         end
     elseif ctr == 0 && ctrN == 1
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wstill = interpolate(G,Qstill);
         end
     elseif ctr == 0 && ctrN == 0
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wstill = interpolate(G,Qstill);
         end
     elseif ctr == 0 && ctrN == -1
         Qstill(i1,i2,i3,i4,i5) = Qstill(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qstill(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wstill = interpolate(G,Qstill);
         end
     elseif ctr == -1 && ctrN == 1
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qup(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wdown = interpolate(G,Qdown);
         end
     elseif ctr == -1 && ctrN == 0
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qstill(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
-            %         Wdown = interpolate(G,Qdown);
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
+            Wdown = interpolate(G,Qdown);
         end
     elseif ctr == -1 && ctrN == -1
         Qdown(i1,i2,i3,i4,i5) = Qdown(i1,i2,i3,i4,i5) + alpha*(reward+gamma*Qdown(i1n,i2n,i3n,i4n,i5n)-Qdown(i1,i2,i3,i4,i5));
-        if (SBRspeedOnOff == 0) % Sto eseguendo la rete full
+        if (SBROnOff == 1 && SBRspeedOnOff == 0) % Sto eseguendo la rete full
             Wdown = interpolate(G,Qdown);
         end
     end
