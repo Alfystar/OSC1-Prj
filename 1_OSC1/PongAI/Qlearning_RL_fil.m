@@ -3,24 +3,24 @@ clear all
 clc
 
 
-global Ln Hn Vn velSig    % Settori Discretizzati
+global Ln Hn Vn velSig  % Settori Discretizzati
 Ln = 2;                 % Numero divisioni in X
 Hn = 4;                 % Numero divisioni in Y
 Vn = 1;                 % Distanza tra 2 coordinate della barra
 velSig = 3;             % 1 = neg, 2 = ~0 , 3 = pos, 2 Var, Vx e Vy
 
 global L H alpha gamma eps V
-L = 10;                  % profondità del campo
+L = 10;                 % profondità del campo
 H = 8;                  % altezza del campo
-gamma = 0.1;              % Peso esperienze future
+gamma = 0.1;            % Peso esperienze future
 alpha = 0.9;            % Peso nuova esperienza
-eps = 0.01;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+eps = 0.01;             % Tolleranza tiro moneta per esplorare (0 non esploro)
 V = 1:Vn:H-1;
 i=1;        % Variabile per contare le iterazioni
 
 
-% X1(Xball)  = Xpalla 
-% X2(Yball)  = Ypalla 
+% X1(Xball)  = Xpalla
+% X2(Yball)  = Ypalla
 % X3(Ybarr)  = ybarra
 % X4(VxBall) = 1 = neg, 2 = ~0 , 3 = pos
 % X5(VyBall) = 1 = neg, 2 = ~0 , 3 = pos
@@ -38,9 +38,9 @@ rimbalziPlotmed = [0];
 scorePlotFilter = [0];
 rimbalziPlotFilter = [0];
 
-gamma = 0.3;              % Peso esperienze future
-alpha = 1;            % Peso nuova esperienza
-eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+gamma = 0.3;        % Peso esperienze future
+alpha = 1;          % Peso nuova esperienza
+eps = 1;            % Tolleranza tiro moneta per esplorare (0 non esploro)
 
 
 %% Inizializazione da file
@@ -50,16 +50,16 @@ load('1_RBF_Trunck_4_giugno.mat');
 
 
 %% Parametri di apprendimento
-gamma = 0.3;              % Peso esperienze future
-alpha = 1;            % Peso nuova esperienza
-eps = 1;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+gamma = 0.3;        % Peso esperienze future
+alpha = 1;          % Peso nuova esperienza
+eps = 1;            % Tolleranza tiro moneta per esplorare (0 non esploro)
 
-%%
+%% Run Reinforcement Learning
 clc
 chk = -1;
 ite = 10;
 itePlot = 100;
-iSave = 10^4; 
+iSave = 10^4;
 
 G = 0;
 a = 1/2^6;
@@ -101,7 +101,7 @@ while(i <= 10^6)
     scorePlotFilter(plotMed) = scorePlotFilter(plotMed-1)*(1-a) + scorePlotmed(plotMed)*a;
     rimbalziPlotFilter(plotMed) = rimbalziPlotFilter(plotMed-1)*(1-b) + rimbalziPlotmed(plotMed)*b;
     plotMed = plotMed+1;
-
+    
     
     if(mod(plotMed,itePlot)==0)
         statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
@@ -120,7 +120,7 @@ while(i <= 10^6)
     fprintf("\n");
 end
 
-%%
+%% Calcolo della funzione Valore
 %%% Calcolo della funzione Valore %%%
 Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
 for i =i/Hn*L 1:L+1
@@ -131,7 +131,7 @@ for i =i/Hn*L 1:L+1
     end
 end
 
-%%
+%% Run Graphical Simulation
 clc
 epsOld = eps;
 eps = 0;
@@ -144,14 +144,14 @@ G=0;
 % [chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,0,0);
 eps = epsOld;
 
-%% 
+%% Filter Score and Bounces
 scorePlotFilter = zeros(1,length(scorePlotmed));
 rimbalziPlotFilter = zeros(1,length(scorePlotmed));
 a = 1/2^6;
 b = 1/2^10;
 for i= 1 : length(scorePlotmed)
-scorePlotFilter(i+1) = scorePlotFilter(i)*(1-a) + scorePlotmed(i)*a;
-rimbalziPlotFilter(i+1) = rimbalziPlotFilter(i)*(1-b) + rimbalziPlotmed(i)*b;
+    scorePlotFilter(i+1) = scorePlotFilter(i)*(1-a) + scorePlotmed(i)*a;
+    rimbalziPlotFilter(i+1) = rimbalziPlotFilter(i)*(1-b) + rimbalziPlotmed(i)*b;
 end
 statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
 
