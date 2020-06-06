@@ -1,0 +1,51 @@
+# CompilerName=lcc64
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root\build\win64
+matlabdir = C:\Program Files\MATLAB\R2019a
+startdir = C:\Users\Filippo Badalamenti\Desktop\Uni\OSC\OSC 1\osc1-2\1_OSC1\PongAI
+
+# Toolchain information
+cc = lcc64
+cxx = 
+linker = lcclnk64
+linkerxx = 
+
+cflags =  -nodeclspec -Zp8 -dll -c -I"$matlabdir\sys\lcc64\lcc64\include64" -DMATLAB_MEX_FILE -noregistrylookup -DNDEBUG -I"$root" -I"$startdir" -I"$root\interface" -I"$matlabdir\extern\include" -I"."   
+
+cxxflags =  -I"$root" -I"$startdir" -I"$root\interface" -I"$matlabdir\extern\include" -I"."   
+
+ldflags =  -dll -L"$matlabdir\sys\lcc64\lcc64\lib64" -L"$matlabdir\extern\lib\win64\microsoft" -entry LibMain libmx.lib libmex.lib libmat.lib libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib -o RBFMatrix_mex.mexw64 -s  RBFMatrix_mex.def
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in -Fo$out
+
+rule cxx
+    command = $cxx $cxxflags $in -Fo$out
+
+rule link
+    command = $linker $in $ldflags
+
+rule linkxx
+    command = $linkerxx $in $ldflags
+
+# Build
+build $builddir\RBFMatrix_mexutil.obj : cc $root\RBFMatrix_mexutil.c
+build $builddir\RBFMatrix_data.obj : cc $root\RBFMatrix_data.c
+build $builddir\RBFMatrix_initialize.obj : cc $root\RBFMatrix_initialize.c
+build $builddir\RBFMatrix_terminate.obj : cc $root\RBFMatrix_terminate.c
+build $builddir\RBFMatrix.obj : cc $root\RBFMatrix.c
+build $builddir\eml_int_forloop_overflow_check.obj : cc $root\eml_int_forloop_overflow_check.c
+build $builddir\_coder_RBFMatrix_info.obj : cc $root\interface\_coder_RBFMatrix_info.c
+build $builddir\_coder_RBFMatrix_api.obj : cc $root\interface\_coder_RBFMatrix_api.c
+build $builddir\_coder_RBFMatrix_mex.obj : cc $root\interface\_coder_RBFMatrix_mex.c
+build $builddir\RBFMatrix_emxutil.obj : cc $root\RBFMatrix_emxutil.c
+build $builddir\c_mexapi_version.obj : cc $matlabdir\extern\version\c_mexapi_version.c
+build $builddir\lccstub.obj : cc $matlabdir\sys\lcc64\lcc64\mex\lccstub.c
+
+# Link
+build $root\RBFMatrix_mex.mexw64 : link $builddir\RBFMatrix_mexutil.obj $builddir\RBFMatrix_data.obj $builddir\RBFMatrix_initialize.obj $builddir\RBFMatrix_terminate.obj $builddir\RBFMatrix.obj $builddir\eml_int_forloop_overflow_check.obj $builddir\_coder_RBFMatrix_info.obj $builddir\_coder_RBFMatrix_api.obj $builddir\_coder_RBFMatrix_mex.obj $builddir\RBFMatrix_emxutil.obj $builddir\c_mexapi_version.obj $builddir\lccstub.obj 

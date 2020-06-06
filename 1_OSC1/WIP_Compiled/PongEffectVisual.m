@@ -3,7 +3,7 @@
 % SBROnOff: 1 attiva la rete RBF, 0 usa il classico RL
 % SBRspeedOnOff (utile solo se SBROnOff=1) : 1 Calcolo rapido prendendo
 %                       pochi centri vicini, 0 Calcolo totale con tutti i centri
-function [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, G, SBROnOff,SBRspeedOnOff)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffectVisual(xb0,yb0,ys0,Qup,Qdown,Qstill,figOnOff, G, SBROnOff,SBRspeedOnOff)
 
 
 global L H alpha gamma eps V
@@ -19,7 +19,7 @@ Lb = 1;                 % lunghezza della barretta
 theta = 0:0.01:2*pi;
 rad = 0.2;
 
-Figura = figOnOff;
+Figura = 1;
 
 if Figura == 1
     close all
@@ -220,8 +220,8 @@ while xb > 0 && counter < maxiter
         end
     end
     
-    if (xb<=0)
-        reward = -1;
+    if (xb<=0) % la pallina mi sorpassa, ho perso
+        reward = -5;
     end
     
     % aggiorniamo la funzione Q(X,U) corretta con il valore di Q(X',U')

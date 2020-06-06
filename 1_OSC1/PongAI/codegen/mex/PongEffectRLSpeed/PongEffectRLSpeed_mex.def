@@ -1,0 +1,25 @@
+LIBRARY PongEffectRLSpeed_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+PongEffectRLSpeed
+MEXGlobalSyncInFunction
+MEXGlobalSyncOutFunction
+emlrt_checkEscapedGlobals
+emlrt_marshallIn
+emlrt_marshallOut
+emlrt_synchGlobalsFromML
+emlrt_synchGlobalsToML
+emxEnsureCapacity_boolean_T
+emxEnsureCapacity_int8_T
+emxEnsureCapacity_real_T
+emxFree_boolean_T
+emxFree_int8_T
+emxFree_real_T
+emxInit_boolean_T
+emxInit_int8_T
+emxInit_real_T
+PongEffectRLSpeed_initialize
+PongEffectRLSpeed_terminate
+PongEffectRLSpeed_atexit

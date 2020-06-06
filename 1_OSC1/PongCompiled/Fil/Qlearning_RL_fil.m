@@ -38,19 +38,19 @@ rimbalziPlotmed = [0];
 scorePlotFilter = [0];
 rimbalziPlotFilter = [0];
 
-gamma = 0.3;        % Peso esperienze future
-alpha = 1;          % Peso nuova esperienza
-eps = 1;            % Tolleranza tiro moneta per esplorare (0 non esploro)
+% gamma = 0.3;        % Peso esperienze future
+% alpha = 1;          % Peso nuova esperienza
+% eps = 1;            % Tolleranza tiro moneta per esplorare (0 non esploro)
 
 
 %% Inizializazione da file
-load('1_RBF_Trunck_4_giugno.mat');
+%load('1_RBF_Trunck_4_giugno.mat');
 % load('2_RL_4_giugno.mat');
 
 
 
 %% Parametri di apprendimento
-gamma = 0.3;        % Peso esperienze future
+gamma = 0.3;              % Peso esperienze future
 alpha = 1;          % Peso nuova esperienza
 eps = 1;            % Tolleranza tiro moneta per esplorare (0 non esploro)
 
@@ -59,12 +59,12 @@ clc
 chk = -1;
 ite = 10;
 itePlot = 100;
-iSave = 10^4;
+iSave = 10^2;
 
 G = 0;
 a = 1/2^6;
 b = 1/2^10;
-while(i <= 10^6)
+while(i <= 10^3)
     %     break;      %Commentare per proseguire addestramento
     
     QupOld = Qup;
@@ -79,18 +79,18 @@ while(i <= 10^6)
         xb0 = L*xRnd;
         yb0 = H*yRnd;
         yp0 = (H-1)*bRnd+1;
-        [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,0,0);
+        [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffectRLSpeed_mex(xb0,yb0,yp0,Qup,Qdown,Qstill,0,G,0,0);
         scorePlot(j) = score;
         rimbalziPlot(j) = rimbalzi;
         scoreTot = scoreTot + score;
         rimbalziTot = rimbalziTot + rimbalzi;
-        fprintf("|%d",i);
+       % fprintf("|%d",i);
         i = i+1;
     end
     fprintf("\n");
     %[chk,Qup,Qdown,Qstill,score,rimbalzi] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1);
-    eps = eps*0.9995;
-    alpha = alpha*0.99995;
+    eps = eps*0.99995;
+    alpha = alpha*0.9995;
     gamma = gamma *1.0005;
     if(gamma >=0.85)
         gamma = 0.85;
@@ -111,25 +111,25 @@ while(i <= 10^6)
         save("RL_backup.mat")
     end
     
-    fprintf("Iterazione %d, scoreMed = %f, rimbalsiMed = %f\n",i,scoreTot/j, rimbalziTot/j);
-    fprintf("Le matrici sono cambiate?\n");
-    fprintf("Qup %d\n", ~isequal(Qup,QupOld));
-    fprintf("Qdown %d\n", ~isequal(Qdown,QdownOld));
-    fprintf("Qstill %d\n", ~isequal(Qstill,QstillOld));
+    fprintf("Iterazione %d, scoreMed = %f, rimbalziMed = %f\n",i,scoreTot/j, rimbalziTot/j);
+%     fprintf("Le matrici sono cambiate?\n");
+%     fprintf("Qup %d\n", ~isequal(Qup,QupOld));
+%     fprintf("Qdown %d\n", ~isequal(Qdown,QdownOld));
+%     fprintf("Qstill %d\n", ~isequal(Qstill,QstillOld));
     fprintf("eps = %.3f\talpha= %.3f\tgamma = %.3f\t\n", eps, alpha, gamma);
     fprintf("\n");
 end
 
-%% Calcolo della funzione Valore
-%%% Calcolo della funzione Valore %%%
-Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
-for i =i/Hn*L 1:L+1
-    for j = 1:H+1
-        for k = 1:length(V)
-            Vpi(i,j,k,1,1) = max([Qup(i,j,k,1,1),Qdown(i,j,k,1,1),Qstill(i,j,k,1,1)]);
-        end
-    end
-end
+% %% Calcolo della funzione Valore
+% %%% Calcolo della funzione Valore %%%
+% Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
+% for i =i/Hn*L 1:L+1
+%     for j = 1:H+1
+%         for k = 1:length(V)
+%             Vpi(i,j,k,1,1) = max([Qup(i,j,k,1,1),Qdown(i,j,k,1,1),Qstill(i,j,k,1,1)]);
+%         end
+%     end
+% end
 
 %% Run Graphical Simulation
 clc
@@ -140,7 +140,8 @@ xb0 = L*xRnd;
 yb0 = H*yRnd;
 yp0 = (H-1)*bRnd+1;
 G=0;
-[chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,1,0);
+%
+[chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffectVisual(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,0,0);
 % [chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffect(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,0,0);
 eps = epsOld;
 
