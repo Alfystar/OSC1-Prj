@@ -59,8 +59,7 @@ clc
 chk = -1;
 ite = 10;
 itePlot = 10;
-iSave = 10^4; 
-
+iSave = 10^4;
 G = 0;
 a = 1/2^6;
 b = 1/2^10;
