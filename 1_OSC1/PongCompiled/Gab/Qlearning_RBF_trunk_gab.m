@@ -118,75 +118,75 @@ end
 
 % commentare da qui per generare il codice mex
 
-% 
-% 
-% %% Calcolo della funzione Valore %%
-% Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
-% for i =i/Hn*L 1:L+1
-%     for j = 1:H+1
-%         for k = 1:length(V)
-%             Vpi(i,j,k,1,1) = max([Qup(i,j,k,1,1),Qdown(i,j,k,1,1),Qstill(i,j,k,1,1)]);
-%         end
-%     end
-% end
-% 
-% %% Simulazione Grafica Pong
-% clc
-% epsOld = eps;
-% eps = 0;
-% xRnd = rand; yRnd = rand; bRnd = rand;
-% xb0 = L*xRnd;
-% yb0 = H*yRnd;
-% yp0 = (H-1)*bRnd+1;
-% G=0;
-% [chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffectVisual(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,1,1);
-% eps = epsOld;
-% 
-% 
-% 
-% %% Visualizzazione andamento Learning
-% scorePlotFilter = zeros(1,length(scorePlotmed));
-% rimbalziPlotFilter = zeros(1,length(scorePlotmed));
-% a = 1/2^6;
-% b = 1/2^10;
-% for i= 1 : length(scorePlotmed)
-%     scorePlotFilter(i+1) = scorePlotFilter(i)*(1-a) + scorePlotmed(i)*a;
-%     rimbalziPlotFilter(i+1) = rimbalziPlotFilter(i)*(1-b) + rimbalziPlotmed(i)*b;
-% end
-% statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
-% 
-% %%
-% 
-% function [] = statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
-% figure(2)
-% clf
-% subplot(1,2,1);
-% plot(scorePlot);
-% grid on
-% legend("score");
-% 
-% subplot(1,2,2);
-% plot(rimbalziPlot);
-% grid on
-% legend("rimbalzi");
-% 
-% figure(3)
-% clf
-% subplot(1,2,1);
-% plot(scorePlotmed);
-% hold on
-% plot(scorePlotFilter,'g');
-% ylim([0,max(1.5,max(scorePlotFilter)*1.5)]);
-% 
-% grid on
-% legend("scorePlotmed");
-%
-% subplot(1,2,2);
-% plot(rimbalziPlotmed);
-% hold on
-% plot(rimbalziPlotFilter,'g');
-% ylim([0,max(rimbalziPlotFilter)*1.5]);
-% 
-% grid on
-% legend("rimbalziPlotmed");
-% end
+
+
+%% Calcolo della funzione Valore %%
+Vpi = zeros(Ln,Hn,length(V),velSig,velSig);
+for i =i/Hn*L 1:L+1
+    for j = 1:H+1
+        for k = 1:length(V)
+            Vpi(i,j,k,1,1) = max([Qup(i,j,k,1,1),Qdown(i,j,k,1,1),Qstill(i,j,k,1,1)]);
+        end
+    end
+end
+
+%% Simulazione Grafica Pong
+clc
+epsOld = eps;
+eps = 0;
+xRnd = rand; yRnd = rand; bRnd = rand;
+xb0 = L*xRnd;
+yb0 = H*yRnd;
+yp0 = (H-1)*bRnd+1;
+G=0;
+[chk,Qup,Qdown,Qstill,score,rimbalzi,G] = PongEffectVisual(xb0,yb0,yp0,Qup,Qdown,Qstill,1,G,1,1);
+eps = epsOld;
+
+
+
+%% Visualizzazione andamento Learning
+scorePlotFilter = zeros(1,length(scorePlotmed));
+rimbalziPlotFilter = zeros(1,length(scorePlotmed));
+a = 1/2^6;
+b = 1/2^10;
+for i= 1 : length(scorePlotmed)
+    scorePlotFilter(i+1) = scorePlotFilter(i)*(1-a) + scorePlotmed(i)*a;
+    rimbalziPlotFilter(i+1) = rimbalziPlotFilter(i)*(1-b) + rimbalziPlotmed(i)*b;
+end
+statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
+
+%%
+
+function [] = statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
+figure(2)
+clf
+subplot(1,2,1);
+plot(scorePlot);
+grid on
+legend("score");
+
+subplot(1,2,2);
+plot(rimbalziPlot);
+grid on
+legend("rimbalzi");
+
+figure(3)
+clf
+subplot(1,2,1);
+plot(scorePlotmed);
+hold on
+plot(scorePlotFilter,'g');
+ylim([0,max(1.5,max(scorePlotFilter)*1.5)]);
+
+grid on
+legend("scorePlotmed");
+
+subplot(1,2,2);
+plot(rimbalziPlotmed);
+hold on
+plot(rimbalziPlotFilter,'g');
+ylim([0,max(rimbalziPlotFilter)*1.5]);
+
+grid on
+legend("rimbalziPlotmed");
+end
