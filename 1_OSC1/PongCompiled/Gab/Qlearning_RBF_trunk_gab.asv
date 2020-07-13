@@ -116,7 +116,7 @@ while(i <= 10^6)
     fprintf("\n");
 end
 
-% commentare da qui per generare il codice mex
+% de
 
 % 
 % 
