@@ -10,21 +10,21 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "_coder_PongEffectTrunc_api.h"
-#include "PongEffectTrunc_mexutil.h"
-#include "PongEffectTrunc_emxutil.h"
+#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_data.h"
+#include "PongEffectTrunc_emxutil.h"
+#include "PongEffectTrunc_mexutil.h"
+#include "rt_nonfinite.h"
 
 /* Variable Definitions */
-static emlrtRTEInfo s_emlrtRTEI = { 1, /* lineNo */
+static emlrtRTEInfo eb_emlrtRTEI = { 1,/* lineNo */
   1,                                   /* colNo */
   "_coder_PongEffectTrunc_api",        /* fName */
   ""                                   /* pName */
 };
 
-static const int32_T iv0[5] = { 2, 4, 7, 3, 3 };
+static const int32_T iv[5] = { 2, 4, 7, 3, 3 };
 
 /* Function Declarations */
 static void c_emlrt_marshallOut(const real_T u[504], const mxArray *y);
@@ -46,7 +46,7 @@ static void o_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src, const
 static void c_emlrt_marshallOut(const real_T u[504], const mxArray *y)
 {
   emlrtMxSetData((mxArray *)y, (void *)&u[0]);
-  emlrtSetDimensions((mxArray *)y, iv0, 5);
+  emlrtSetDimensions((mxArray *)y, iv, 5);
 }
 
 static void d_emlrt_marshallOut(const emxArray_real_T *u, const mxArray *y)
@@ -98,7 +98,7 @@ static real_T (*n_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   const emlrtMsgIdentifier *msgId))[504]
 {
   real_T (*ret)[504];
-  emlrtCheckBuiltInR2012b(sp, msgId, src, "double", false, 5U, iv0);
+  emlrtCheckBuiltInR2012b(sp, msgId, src, "double", false, 5U, iv);
   ret = (real_T (*)[504])emlrtMxGetData(src);
   emlrtDestroyArray(&src);
   return ret;
@@ -108,24 +108,24 @@ static real_T (*n_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
 {
   static const int32_T dims[2] = { 504, 504 };
 
-  const boolean_T bv0[2] = { true, true };
+  const boolean_T bv[2] = { true, true };
 
-  int32_T iv15[2];
-  int32_T i23;
-  emlrtCheckVsBuiltInR2012b(sp, msgId, src, "double", false, 2U, dims, &bv0[0],
-    iv15);
-  ret->allocatedSize = iv15[0] * iv15[1];
-  i23 = ret->size[0] * ret->size[1];
-  ret->size[0] = iv15[0];
-  ret->size[1] = iv15[1];
-  emxEnsureCapacity_real_T(sp, ret, i23, (emlrtRTEInfo *)NULL);
+  int32_T b_iv[2];
+  int32_T i;
+  emlrtCheckVsBuiltInR2012b(sp, msgId, src, "double", false, 2U, dims, &bv[0],
+    b_iv);
+  ret->allocatedSize = b_iv[0] * b_iv[1];
+  i = ret->size[0] * ret->size[1];
+  ret->size[0] = b_iv[0];
+  ret->size[1] = b_iv[1];
+  emxEnsureCapacity_real_T(sp, ret, i, (emlrtRTEInfo *)NULL);
   ret->data = (real_T *)emlrtMxGetData(src);
   ret->canFreeData = false;
   emlrtDestroyArray(&src);
 }
 
-void PongEffectTrunc_api(const mxArray *prhs[10], int32_T nlhs, const mxArray
-  *plhs[7])
+void PongEffectTrunc_api(const mxArray * const prhs[10], int32_T nlhs, const
+  mxArray *plhs[7])
 {
   emxArray_real_T *G;
   const mxArray *prhs_copy_idx_3;
@@ -151,7 +151,7 @@ void PongEffectTrunc_api(const mxArray *prhs[10], int32_T nlhs, const mxArray
 
   st.tls = emlrtRootTLSGlobal;
   emlrtHeapReferenceStackEnterFcnR2012b(&st);
-  emxInit_real_T(&st, &G, 2, &s_emlrtRTEI, true);
+  emxInit_real_T(&st, &G, 2, &eb_emlrtRTEI, true);
   prhs_copy_idx_3 = emlrtProtectR2012b(prhs[3], 3, true, -1);
   prhs_copy_idx_4 = emlrtProtectR2012b(prhs[4], 4, true, -1);
   prhs_copy_idx_5 = emlrtProtectR2012b(prhs[5], 5, true, -1);

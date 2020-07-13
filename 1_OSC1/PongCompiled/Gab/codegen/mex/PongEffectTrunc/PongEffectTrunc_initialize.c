@@ -10,12 +10,12 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc_mexutil.h"
-#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_initialize.h"
-#include "_coder_PongEffectTrunc_mex.h"
+#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_data.h"
+#include "PongEffectTrunc_mexutil.h"
+#include "_coder_PongEffectTrunc_mex.h"
+#include "rt_nonfinite.h"
 
 /* Function Declarations */
 static void PongEffectTrunc_once(const emlrtStack *sp);
@@ -23,11 +23,12 @@ static void PongEffectTrunc_once(const emlrtStack *sp);
 /* Function Definitions */
 static void PongEffectTrunc_once(const emlrtStack *sp)
 {
-  int32_T i0;
+  int32_T i;
+  mex_InitInfAndNan();
   velSig = 3.0;
   velSig_dirty = 1U;
-  for (i0 = 0; i0 < 7; i0++) {
-    V[i0] = 1.0 + (real_T)i0;
+  for (i = 0; i < 7; i++) {
+    V[i] = (real_T)i + 1.0;
   }
 
   V_dirty = 1U;
@@ -47,7 +48,7 @@ static void PongEffectTrunc_once(const emlrtStack *sp)
   L_dirty = 1U;
   beta = 0.3;
   beta_dirty = 1U;
-  emlrtSetGlobalSyncFcn(sp, (void (*)(const void *))emlrt_synchGlobalsToML);
+  emlrtSetGlobalSyncFcn(sp, (void (*)(const void *))&emlrt_synchGlobalsToML);
 }
 
 void PongEffectTrunc_initialize(void)

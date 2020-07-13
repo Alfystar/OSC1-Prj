@@ -5,12 +5,11 @@
  *
  * PongEffectTrunc_types.h
  *
- * Code generation for function 'PongEffectTrunc'
+ * Code generation for function 'PongEffectTrunc_types'
  *
  */
 
-#ifndef PONGEFFECTTRUNC_TYPES_H
-#define PONGEFFECTTRUNC_TYPES_H
+#pragma once
 
 /* Include files */
 #include "rtwtypes.h"
@@ -78,6 +77,5 @@ struct emxArray_real_T
 typedef struct emxArray_real_T emxArray_real_T;
 
 #endif                                 /*typedef_emxArray_real_T*/
-#endif
 
 /* End of code generation (PongEffectTrunc_types.h) */

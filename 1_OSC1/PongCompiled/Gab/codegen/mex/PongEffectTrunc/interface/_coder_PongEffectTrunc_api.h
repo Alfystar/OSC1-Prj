@@ -9,24 +9,20 @@
  *
  */
 
-#ifndef _CODER_PONGEFFECTTRUNC_API_H
-#define _CODER_PONGEFFECTTRUNC_API_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void PongEffectTrunc_api(const mxArray *prhs[10], int32_T nlhs, const
+void PongEffectTrunc_api(const mxArray * const prhs[10], int32_T nlhs, const
   mxArray *plhs[7]);
-
-#endif
 
 /* End of code generation (_coder_PongEffectTrunc_api.h) */

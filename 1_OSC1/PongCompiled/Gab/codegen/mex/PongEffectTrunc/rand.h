@@ -3,31 +3,25 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * xgetrf.h
+ * rand.h
  *
- * Code generation for function 'xgetrf'
+ * Code generation for function 'rand'
  *
  */
 
-#ifndef XGETRF_H
-#define XGETRF_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void xgetrf(const emlrtStack *sp, int32_T m, int32_T n, emxArray_real_T
-                   *A, int32_T lda, int32_T ipiv_data[], int32_T ipiv_size[2],
-                   int32_T *info);
+real_T b_rand(void);
 
-#endif
-
-/* End of code generation (xgetrf.h) */
+/* End of code generation (rand.h) */

@@ -10,106 +10,97 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "lusolve.h"
-#include "xtrsm.h"
+#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_emxutil.h"
+#include "rt_nonfinite.h"
 #include "warning.h"
-#include "xgetrf.h"
+#include "xgetrfs.h"
+#include <string.h>
 
 /* Variable Definitions */
 static emlrtRSInfo sb_emlrtRSI = { 67, /* lineNo */
   "lusolve",                           /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pathName */
 };
 
-static emlrtRSInfo tb_emlrtRSI = { 109,/* lineNo */
+static emlrtRSInfo tb_emlrtRSI = { 112,/* lineNo */
   "lusolveNxN",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pathName */
 };
 
-static emlrtRSInfo ub_emlrtRSI = { 107,/* lineNo */
+static emlrtRSInfo ub_emlrtRSI = { 109,/* lineNo */
   "lusolveNxN",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pathName */
 };
 
-static emlrtRSInfo kc_emlrtRSI = { 90, /* lineNo */
+static emlrtRSInfo vb_emlrtRSI = { 124,/* lineNo */
+  "InvAtimesX",                        /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pathName */
+};
+
+static emlrtRSInfo hc_emlrtRSI = { 90, /* lineNo */
   "warn_singular",                     /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pathName */
 };
 
-static emlrtRTEInfo k_emlrtRTEI = { 1, /* lineNo */
+static emlrtRTEInfo u_emlrtRTEI = { 124,/* lineNo */
+  9,                                   /* colNo */
+  "lusolve",                           /* fName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pName */
+};
+
+static emlrtRTEInfo v_emlrtRTEI = { 1, /* lineNo */
   19,                                  /* colNo */
   "lusolve",                           /* fName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/lusolve.m"/* pName */
 };
-
-static emlrtRTEInfo v_emlrtRTEI = { 107,/* lineNo */
-  2,                                   /* colNo */
-  "lusolve",                           /* fName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pName */
-};
-
-/* Function Declarations */
-static void warn_singular(const emlrtStack *sp);
 
 /* Function Definitions */
-static void warn_singular(const emlrtStack *sp)
+void lusolve(const emlrtStack *sp, const emxArray_real_T *A, const real_T
+             B_data[], const int32_T B_size[1], real_T X_data[], int32_T X_size
+             [1])
 {
-  emlrtStack st;
-  st.prev = sp;
-  st.tls = sp->tls;
-  st.site = &kc_emlrtRSI;
-  warning(&st);
-}
-
-void lusolve(const emlrtStack *sp, const emxArray_real_T *A, real_T B_data[])
-{
-  emxArray_real_T *b_A;
-  int32_T info;
   int32_T loop_ub;
-  int32_T ipiv_data[504];
-  int32_T ipiv_size[2];
-  real_T temp;
+  emxArray_real_T *b_A;
+  int32_T i;
   emlrtStack st;
   emlrtStack b_st;
+  emlrtStack c_st;
   st.prev = sp;
   st.tls = sp->tls;
   b_st.prev = &st;
   b_st.tls = st.tls;
+  c_st.prev = &b_st;
+  c_st.tls = b_st.tls;
   emlrtHeapReferenceStackEnterFcnR2012b(sp);
-  emxInit_real_T(sp, &b_A, 2, &k_emlrtRTEI, true);
   st.site = &sb_emlrtRSI;
-  info = b_A->size[0] * b_A->size[1];
+  b_st.site = &ub_emlrtRSI;
+  X_size[0] = B_size[0];
+  loop_ub = B_size[0];
+  if (0 <= loop_ub - 1) {
+    memcpy(&X_data[0], &B_data[0], loop_ub * sizeof(real_T));
+  }
+
+  emxInit_real_T(&b_st, &b_A, 2, &v_emlrtRTEI, true);
+  i = b_A->size[0] * b_A->size[1];
   b_A->size[0] = A->size[0];
   b_A->size[1] = A->size[1];
-  emxEnsureCapacity_real_T(&st, b_A, info, &v_emlrtRTEI);
+  emxEnsureCapacity_real_T(&b_st, b_A, i, &u_emlrtRTEI);
   loop_ub = A->size[0] * A->size[1];
-  for (info = 0; info < loop_ub; info++) {
-    b_A->data[info] = A->data[info];
+  for (i = 0; i < loop_ub; i++) {
+    b_A->data[i] = A->data[i];
   }
 
-  b_st.site = &ub_emlrtRSI;
-  xgetrf(&b_st, A->size[1], A->size[1], b_A, A->size[1], ipiv_data, ipiv_size,
-         &info);
-  if (((A->size[0] != 1) || (A->size[1] != 1)) && (info > 0)) {
-    b_st.site = &tb_emlrtRSI;
-    warn_singular(&b_st);
-  }
-
-  info = A->size[1];
-  for (loop_ub = 0; loop_ub <= info - 2; loop_ub++) {
-    if (ipiv_data[loop_ub] != loop_ub + 1) {
-      temp = B_data[loop_ub];
-      B_data[loop_ub] = B_data[ipiv_data[loop_ub] - 1];
-      B_data[ipiv_data[loop_ub] - 1] = temp;
-    }
-  }
-
-  xtrsm(A->size[1], b_A, A->size[1], B_data, A->size[1]);
-  b_xtrsm(A->size[1], b_A, A->size[1], B_data, A->size[1]);
+  c_st.site = &vb_emlrtRSI;
+  loop_ub = xgetrfs(&c_st, b_A, X_data, X_size);
   emxFree_real_T(&b_A);
+  if (((A->size[0] != 1) || (A->size[1] != 1)) && (loop_ub > 0)) {
+    b_st.site = &tb_emlrtRSI;
+    c_st.site = &hc_emlrtRSI;
+    warning(&c_st);
+  }
+
   emlrtHeapReferenceStackLeaveFcnR2012b(sp);
 }
 

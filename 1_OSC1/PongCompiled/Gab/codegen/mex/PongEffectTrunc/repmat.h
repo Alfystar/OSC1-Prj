@@ -9,24 +9,20 @@
  *
  */
 
-#ifndef REPMAT_H
-#define REPMAT_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void repmat(const emlrtStack *sp, ptrdiff_t a, int32_T varargin_1,
-                   ptrdiff_t b_data[], int32_T b_size[1]);
-
-#endif
+void repmat(ptrdiff_t a, int32_T varargin_1, ptrdiff_t b_data[], int32_T b_size
+            [1]);
 
 /* End of code generation (repmat.h) */

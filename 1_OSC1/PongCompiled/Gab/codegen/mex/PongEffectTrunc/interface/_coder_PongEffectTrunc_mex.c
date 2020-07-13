@@ -10,20 +10,20 @@
  */
 
 /* Include files */
-#include "PongEffectTrunc.h"
 #include "_coder_PongEffectTrunc_mex.h"
+#include "PongEffectTrunc.h"
+#include "PongEffectTrunc_data.h"
+#include "PongEffectTrunc_initialize.h"
 #include "PongEffectTrunc_terminate.h"
 #include "_coder_PongEffectTrunc_api.h"
-#include "PongEffectTrunc_initialize.h"
-#include "PongEffectTrunc_data.h"
 
 /* Function Declarations */
-static void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *plhs[7], int32_T
-  nrhs, const mxArray *prhs[10]);
+MEXFUNCTION_LINKAGE void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *
+  plhs[7], int32_T nrhs, const mxArray *prhs[10]);
 
 /* Function Definitions */
-static void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *plhs[7], int32_T
-  nrhs, const mxArray *prhs[10])
+void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *plhs[7], int32_T nrhs,
+  const mxArray *prhs[10])
 {
   const mxArray *outputs[7];
   int32_T b_nlhs;
@@ -61,7 +61,7 @@ static void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *plhs[7], int32_T
 void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs, const mxArray
                  *prhs[])
 {
-  mexAtExit(PongEffectTrunc_atexit);
+  mexAtExit(&PongEffectTrunc_atexit);
 
   /* Module initialization. */
   PongEffectTrunc_initialize();

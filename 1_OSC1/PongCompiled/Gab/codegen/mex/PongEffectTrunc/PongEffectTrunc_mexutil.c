@@ -10,10 +10,10 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_mexutil.h"
+#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_data.h"
+#include "rt_nonfinite.h"
 
 /* Function Declarations */
 static real_T b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
@@ -41,22 +41,22 @@ static real_T b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
 static const mxArray *b_emlrt_marshallOut(const real_T u[7])
 {
   const mxArray *y;
-  const mxArray *m34;
-  static const int32_T iv14[2] = { 1, 7 };
+  const mxArray *m;
+  static const int32_T b_iv[2] = { 1, 7 };
 
   real_T *pData;
-  int32_T i21;
   int32_T i;
+  int32_T b_i;
   y = NULL;
-  m34 = emlrtCreateNumericArray(2, iv14, mxDOUBLE_CLASS, mxREAL);
-  pData = emlrtMxGetPr(m34);
-  i21 = 0;
-  for (i = 0; i < 7; i++) {
-    pData[i21] = u[i];
-    i21++;
+  m = emlrtCreateNumericArray(2, &b_iv[0], mxDOUBLE_CLASS, mxREAL);
+  pData = emlrtMxGetPr(m);
+  i = 0;
+  for (b_i = 0; b_i < 7; b_i++) {
+    pData[i] = u[b_i];
+    i++;
   }
 
-  emlrtAssign(&y, m34);
+  emlrtAssign(&y, m);
   return y;
 }
 
@@ -94,12 +94,12 @@ static void m_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src, const
 {
   static const int32_T dims[2] = { 1, 7 };
 
-  real_T (*r0)[7];
-  int32_T i22;
+  real_T (*r)[7];
+  int32_T i;
   emlrtCheckBuiltInR2012b(sp, msgId, src, "double", false, 2U, dims);
-  r0 = (real_T (*)[7])emlrtMxGetData(src);
-  for (i22 = 0; i22 < 7; i22++) {
-    ret[i22] = (*r0)[i22];
+  r = (real_T (*)[7])emlrtMxGetData(src);
+  for (i = 0; i < 7; i++) {
+    ret[i] = (*r)[i];
   }
 
   emlrtDestroyArray(&src);
@@ -254,10 +254,10 @@ real_T emlrt_marshallIn(const emlrtStack *sp, const mxArray *a__output_of_feval_
 const mxArray *emlrt_marshallOut(const real_T u)
 {
   const mxArray *y;
-  const mxArray *m33;
+  const mxArray *m;
   y = NULL;
-  m33 = emlrtCreateDoubleScalar(u);
-  emlrtAssign(&y, m33);
+  m = emlrtCreateDoubleScalar(u);
+  emlrtAssign(&y, m);
   return y;
 }
 

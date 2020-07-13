@@ -1,31 +1,31 @@
-# CompilerName=lcc64
+# CompilerName=gcc
 # Mode=optim
 ninja_required_version = 1.3
 
 # Basic folders
 root = .
-builddir = $root\build\win64
-matlabdir = C:\Program Files\MATLAB\R2019a
-startdir = C:\Users\Filippo Badalamenti\Desktop\Uni\OSC\OSC 1\osc1-2\1_OSC1\PongCompiled\Gab
+builddir = $root/build/glnxa64
+matlabdir = /usr/local/MATLAB/R2020a
+startdir = /home/gabriele/Scrivania/osc1-2/1_OSC1/PongCompiled/Gab
 
 # Toolchain information
-cc = lcc64
-cxx = 
-linker = lcclnk64
-linkerxx = 
+cc = /usr/bin/gcc
+cxx = g++
+linker = /usr/bin/gcc
+linkerxx = g++
 
-cflags =  -nodeclspec -Zp8 -dll -c -I"$matlabdir\sys\lcc64\lcc64\include64" -DMATLAB_MEX_FILE -noregistrylookup -DNDEBUG -I"$root" -I"$startdir" -I"$root\interface" -I"$matlabdir\extern\include" -I"." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS  
+cflags =  -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -std=c99 -I "$root" -I "$startdir" -I "$root/interface" -I "$matlabdir/extern/include" -I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=PongEffectTrunc_mex -c 
 
-cxxflags =  -I"$root" -I"$startdir" -I"$root\interface" -I"$matlabdir\extern\include" -I"." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS  
+cxxflags =  -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -std=c++11 -I "$root" -I "$startdir" -I "$root/interface" -I "$matlabdir/extern/include" -I "." -DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE -DMW_HAVE_LAPACK_DECLS -DMODEL=PongEffectTrunc_mex -c 
 
-ldflags =  -dll -L"$matlabdir\sys\lcc64\lcc64\lib64" -L"$matlabdir\extern\lib\win64\microsoft" -entry LibMain libmx.lib libmex.lib libmat.lib libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib -o PongEffectTrunc_mex.mexw64 -s -L"$matlabdir\extern\lib\win64\microsoft" libmwlapack.lib libmwblas.lib  PongEffectTrunc_mex.def
+ldflags =  -pthread -Wl,--no-undefined -Wl,-rpath-link,$matlabdir/bin/glnxa64 -shared  -L"$matlabdir/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++  -o PongEffectTrunc_mex.mexa64 -L"$matlabdir/bin/glnxa64" -lmwlapack -lmwblas -lemlrt -lcovrt -lut -lmwmathutil  -Wl,--version-script,PongEffectTrunc_mex.map
 
 # Build Rules
 rule cc
-    command = $cc $cflags $in -Fo$out
+    command = $cc $cflags $in -o $out
 
 rule cxx
-    command = $cxx $cxxflags $in -Fo$out
+    command = $cxx $cxxflags $in -o $out
 
 rule link
     command = $linker $in $ldflags
@@ -34,27 +34,26 @@ rule linkxx
     command = $linkerxx $in $ldflags
 
 # Build
-build $builddir\PongEffectTrunc_mexutil.obj : cc $root\PongEffectTrunc_mexutil.c
-build $builddir\PongEffectTrunc_data.obj : cc $root\PongEffectTrunc_data.c
-build $builddir\PongEffectTrunc_initialize.obj : cc $root\PongEffectTrunc_initialize.c
-build $builddir\PongEffectTrunc_terminate.obj : cc $root\PongEffectTrunc_terminate.c
-build $builddir\PongEffectTrunc.obj : cc $root\PongEffectTrunc.c
-build $builddir\eml_int_forloop_overflow_check.obj : cc $root\eml_int_forloop_overflow_check.c
-build $builddir\lusolve.obj : cc $root\lusolve.c
-build $builddir\xgetrf.obj : cc $root\xgetrf.c
-build $builddir\repmat.obj : cc $root\repmat.c
-build $builddir\infocheck.obj : cc $root\infocheck.c
-build $builddir\warning.obj : cc $root\warning.c
-build $builddir\xtrsm.obj : cc $root\xtrsm.c
-build $builddir\qrsolve.obj : cc $root\qrsolve.c
-build $builddir\xgeqp3.obj : cc $root\xgeqp3.c
-build $builddir\norm.obj : cc $root\norm.c
-build $builddir\_coder_PongEffectTrunc_info.obj : cc $root\interface\_coder_PongEffectTrunc_info.c
-build $builddir\_coder_PongEffectTrunc_api.obj : cc $root\interface\_coder_PongEffectTrunc_api.c
-build $builddir\_coder_PongEffectTrunc_mex.obj : cc $root\interface\_coder_PongEffectTrunc_mex.c
-build $builddir\PongEffectTrunc_emxutil.obj : cc $root\PongEffectTrunc_emxutil.c
-build $builddir\c_mexapi_version.obj : cc $matlabdir\extern\version\c_mexapi_version.c
-build $builddir\lccstub.obj : cc $matlabdir\sys\lcc64\lcc64\mex\lccstub.c
+build $builddir/rt_nonfinite.o : cc $root/rt_nonfinite.c
+build $builddir/PongEffectTrunc_mexutil.o : cc $root/PongEffectTrunc_mexutil.c
+build $builddir/PongEffectTrunc_data.o : cc $root/PongEffectTrunc_data.c
+build $builddir/PongEffectTrunc_initialize.o : cc $root/PongEffectTrunc_initialize.c
+build $builddir/PongEffectTrunc_terminate.o : cc $root/PongEffectTrunc_terminate.c
+build $builddir/PongEffectTrunc.o : cc $root/PongEffectTrunc.c
+build $builddir/eml_int_forloop_overflow_check.o : cc $root/eml_int_forloop_overflow_check.c
+build $builddir/lusolve.o : cc $root/lusolve.c
+build $builddir/xgetrfs.o : cc $root/xgetrfs.c
+build $builddir/repmat.o : cc $root/repmat.c
+build $builddir/warning.o : cc $root/warning.c
+build $builddir/qrsolve.o : cc $root/qrsolve.c
+build $builddir/xgeqp3.o : cc $root/xgeqp3.c
+build $builddir/rand.o : cc $root/rand.c
+build $builddir/mtimes.o : cc $root/mtimes.c
+build $builddir/_coder_PongEffectTrunc_api.o : cc $root/interface/_coder_PongEffectTrunc_api.c
+build $builddir/_coder_PongEffectTrunc_mex.o : cc $root/interface/_coder_PongEffectTrunc_mex.c
+build $builddir/PongEffectTrunc_emxutil.o : cc $root/PongEffectTrunc_emxutil.c
+build $builddir/_coder_PongEffectTrunc_info.o : cc $root/interface/_coder_PongEffectTrunc_info.c
+build $builddir/c_mexapi_version.o : cc $matlabdir/extern/version/c_mexapi_version.c
 
 # Link
-build $root\PongEffectTrunc_mex.mexw64 : link $builddir\PongEffectTrunc_mexutil.obj $builddir\PongEffectTrunc_data.obj $builddir\PongEffectTrunc_initialize.obj $builddir\PongEffectTrunc_terminate.obj $builddir\PongEffectTrunc.obj $builddir\eml_int_forloop_overflow_check.obj $builddir\lusolve.obj $builddir\xgetrf.obj $builddir\repmat.obj $builddir\infocheck.obj $builddir\warning.obj $builddir\xtrsm.obj $builddir\qrsolve.obj $builddir\xgeqp3.obj $builddir\norm.obj $builddir\_coder_PongEffectTrunc_info.obj $builddir\_coder_PongEffectTrunc_api.obj $builddir\_coder_PongEffectTrunc_mex.obj $builddir\PongEffectTrunc_emxutil.obj $builddir\c_mexapi_version.obj $builddir\lccstub.obj 
+build $root/PongEffectTrunc_mex.mexa64 : link $builddir/rt_nonfinite.o $builddir/PongEffectTrunc_mexutil.o $builddir/PongEffectTrunc_data.o $builddir/PongEffectTrunc_initialize.o $builddir/PongEffectTrunc_terminate.o $builddir/PongEffectTrunc.o $builddir/eml_int_forloop_overflow_check.o $builddir/lusolve.o $builddir/xgetrfs.o $builddir/repmat.o $builddir/warning.o $builddir/qrsolve.o $builddir/xgeqp3.o $builddir/rand.o $builddir/mtimes.o $builddir/_coder_PongEffectTrunc_api.o $builddir/_coder_PongEffectTrunc_mex.o $builddir/PongEffectTrunc_emxutil.o $builddir/_coder_PongEffectTrunc_info.o $builddir/c_mexapi_version.o 

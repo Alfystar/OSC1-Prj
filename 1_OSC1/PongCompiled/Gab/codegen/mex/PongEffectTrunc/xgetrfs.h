@@ -3,30 +3,26 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * infocheck.h
+ * xgetrfs.h
  *
- * Code generation for function 'infocheck'
+ * Code generation for function 'xgetrfs'
  *
  */
 
-#ifndef INFOCHECK_H
-#define INFOCHECK_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern boolean_T b_infocheck(const emlrtStack *sp, int32_T info);
-extern boolean_T infocheck(const emlrtStack *sp, int32_T info);
+int32_T xgetrfs(const emlrtStack *sp, emxArray_real_T *A, real_T B_data[], const
+                int32_T B_size[1]);
 
-#endif
-
-/* End of code generation (infocheck.h) */
+/* End of code generation (xgetrfs.h) */

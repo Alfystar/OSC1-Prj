@@ -10,10 +10,10 @@
  */
 
 /* Include files */
-#include <string.h>
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_emxutil.h"
+#include "PongEffectTrunc.h"
+#include "rt_nonfinite.h"
+#include <string.h>
 
 /* Function Definitions */
 void emxEnsureCapacity_boolean_T(const emlrtStack *sp, emxArray_boolean_T
@@ -42,7 +42,7 @@ void emxEnsureCapacity_boolean_T(const emlrtStack *sp, emxArray_boolean_T
       if (i > 1073741823) {
         i = MAX_int32_T;
       } else {
-        i <<= 1;
+        i *= 2;
       }
     }
 
@@ -90,7 +90,7 @@ void emxEnsureCapacity_int8_T(const emlrtStack *sp, emxArray_int8_T *emxArray,
       if (i > 1073741823) {
         i = MAX_int32_T;
       } else {
-        i <<= 1;
+        i *= 2;
       }
     }
 
@@ -138,7 +138,7 @@ void emxEnsureCapacity_real_T(const emlrtStack *sp, emxArray_real_T *emxArray,
       if (i > 1073741823) {
         i = MAX_int32_T;
       } else {
-        i <<= 1;
+        i *= 2;
       }
     }
 
@@ -211,8 +211,8 @@ void emxInit_boolean_T(const emlrtStack *sp, emxArray_boolean_T **pEmxArray,
   }
 
   if (doPush) {
-    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void (*)(void *))
-      emxFree_boolean_T);
+    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void *)
+      &emxFree_boolean_T);
   }
 
   emxArray = *pEmxArray;
@@ -242,8 +242,8 @@ void emxInit_int8_T(const emlrtStack *sp, emxArray_int8_T **pEmxArray, int32_T
   }
 
   if (doPush) {
-    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void (*)(void *))
-      emxFree_int8_T);
+    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void *)
+      &emxFree_int8_T);
   }
 
   emxArray = *pEmxArray;
@@ -273,8 +273,8 @@ void emxInit_real_T(const emlrtStack *sp, emxArray_real_T **pEmxArray, int32_T
   }
 
   if (doPush) {
-    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void (*)(void *))
-      emxFree_real_T);
+    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void *)
+      &emxFree_real_T);
   }
 
   emxArray = *pEmxArray;

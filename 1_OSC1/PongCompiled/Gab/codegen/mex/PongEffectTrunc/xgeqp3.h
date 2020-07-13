@@ -9,24 +9,20 @@
  *
  */
 
-#ifndef XGEQP3_H
-#define XGEQP3_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void xgeqp3(const emlrtStack *sp, emxArray_real_T *A, real_T tau_data[],
-                   int32_T tau_size[1], int32_T jpvt_data[], int32_T jpvt_size[2]);
-
-#endif
+void xgeqp3(const emlrtStack *sp, emxArray_real_T *A, real_T tau_data[], int32_T
+            tau_size[1], int32_T jpvt_data[], int32_T jpvt_size[2]);
 
 /* End of code generation (xgeqp3.h) */

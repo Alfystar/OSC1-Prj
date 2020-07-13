@@ -10,12 +10,12 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_terminate.h"
+#include "PongEffectTrunc.h"
+#include "PongEffectTrunc_data.h"
 #include "PongEffectTrunc_mexutil.h"
 #include "_coder_PongEffectTrunc_mex.h"
-#include "PongEffectTrunc_data.h"
+#include "rt_nonfinite.h"
 
 /* Function Definitions */
 void PongEffectTrunc_atexit(void)

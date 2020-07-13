@@ -9,25 +9,23 @@
  *
  */
 
-#ifndef _CODER_PONGEFFECTTRUNC_MEX_H
-#define _CODER_PONGEFFECTTRUNC_MEX_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs, const
-  mxArray *prhs[]);
-extern emlrtCTX mexFunctionCreateRootTLS(void);
-
-#endif
+MEXFUNCTION_LINKAGE void PongEffectTrunc_mexFunction(int32_T nlhs, mxArray *
+  plhs[7], int32_T nrhs, const mxArray *prhs[10]);
+MEXFUNCTION_LINKAGE void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs,
+  const mxArray *prhs[]);
+emlrtCTX mexFunctionCreateRootTLS(void);
 
 /* End of code generation (_coder_PongEffectTrunc_mex.h) */

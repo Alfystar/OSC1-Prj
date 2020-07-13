@@ -9,25 +9,21 @@
  *
  */
 
-#ifndef QRSOLVE_H
-#define QRSOLVE_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void qrsolve(const emlrtStack *sp, const emxArray_real_T *A, const real_T
-                    B_data[], const int32_T B_size[1], real_T Y_data[], int32_T
-                    Y_size[1]);
-
-#endif
+void qrsolve(const emlrtStack *sp, const emxArray_real_T *A, const real_T
+             B_data[], const int32_T B_size[1], real_T Y_data[], int32_T Y_size
+             [1]);
 
 /* End of code generation (qrsolve.h) */

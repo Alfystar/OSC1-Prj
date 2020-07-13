@@ -10,9 +10,9 @@
  */
 
 /* Include files */
-#include "rt_nonfinite.h"
-#include "PongEffectTrunc.h"
 #include "PongEffectTrunc_data.h"
+#include "PongEffectTrunc.h"
+#include "rt_nonfinite.h"
 
 /* Variable Definitions */
 emlrtCTX emlrtRootTLSGlobal = NULL;
@@ -39,7 +39,7 @@ uint32_T V_dirty;
 uint32_T velSig_dirty;
 emlrtContext emlrtContextGlobal = { true,/* bFirstTime */
   false,                               /* bInitialized */
-  131482U,                             /* fVersionInfo */
+  131594U,                             /* fVersionInfo */
   NULL,                                /* fErrorFunction */
   "PongEffectTrunc",                   /* fFunctionName */
   NULL,                                /* fRTCallStack */
@@ -50,199 +50,169 @@ emlrtContext emlrtContextGlobal = { true,/* bFirstTime */
 
 emlrtRSInfo f_emlrtRSI = { 80,         /* lineNo */
   "PongEffectTrunc",                   /* fcnName */
-  "C:\\Users\\Filippo Badalamenti\\Desktop\\Uni\\OSC\\OSC 1\\osc1-2\\1_OSC1\\PongCompiled\\Gab\\PongEffectTrunc.m"/* pathName */
+  "/home/gabriele/Scrivania/osc1-2/1_OSC1/PongCompiled/Gab/PongEffectTrunc.m"/* pathName */
 };
 
 emlrtRSInfo g_emlrtRSI = { 90,         /* lineNo */
   "PongEffectTrunc",                   /* fcnName */
-  "C:\\Users\\Filippo Badalamenti\\Desktop\\Uni\\OSC\\OSC 1\\osc1-2\\1_OSC1\\PongCompiled\\Gab\\PongEffectTrunc.m"/* pathName */
+  "/home/gabriele/Scrivania/osc1-2/1_OSC1/PongCompiled/Gab/PongEffectTrunc.m"/* pathName */
 };
 
 emlrtRSInfo i_emlrtRSI = { 115,        /* lineNo */
   "PongEffectTrunc",                   /* fcnName */
-  "C:\\Users\\Filippo Badalamenti\\Desktop\\Uni\\OSC\\OSC 1\\osc1-2\\1_OSC1\\PongCompiled\\Gab\\PongEffectTrunc.m"/* pathName */
+  "/home/gabriele/Scrivania/osc1-2/1_OSC1/PongCompiled/Gab/PongEffectTrunc.m"/* pathName */
 };
 
-emlrtRSInfo t_emlrtRSI = { 17,         /* lineNo */
+emlrtRSInfo t_emlrtRSI = { 18,         /* lineNo */
   "ifWhileCond",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\ifWhileCond.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/ifWhileCond.m"/* pathName */
 };
 
-emlrtRSInfo u_emlrtRSI = { 30,         /* lineNo */
+emlrtRSInfo u_emlrtRSI = { 31,         /* lineNo */
   "checkNoNaNs",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\ifWhileCond.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/ifWhileCond.m"/* pathName */
 };
 
 emlrtRSInfo v_emlrtRSI = { 21,         /* lineNo */
   "eml_int_forloop_overflow_check",    /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\lib\\matlab\\eml\\eml_int_forloop_overflow_check.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/lib/matlab/eml/eml_int_forloop_overflow_check.m"/* pathName */
 };
 
-emlrtRSInfo vb_emlrtRSI = { 139,       /* lineNo */
-  "lusolveNxN",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+emlrtRSInfo xb_emlrtRSI = { 111,       /* lineNo */
+  "cmldiv",                            /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgetrfs.m"/* pathName */
 };
 
-emlrtRSInfo wb_emlrtRSI = { 150,       /* lineNo */
-  "lusolveNxN",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+emlrtRSInfo ac_emlrtRSI = { 100,       /* lineNo */
+  "cmldiv",                            /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgetrfs.m"/* pathName */
 };
 
-emlrtRSInfo xb_emlrtRSI = { 152,       /* lineNo */
-  "lusolveNxN",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\lusolve.m"/* pathName */
+emlrtRSInfo bc_emlrtRSI = { 68,        /* lineNo */
+  "cmldiv",                            /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgetrfs.m"/* pathName */
 };
 
-emlrtRSInfo yb_emlrtRSI = { 9,         /* lineNo */
+emlrtRSInfo cc_emlrtRSI = { 54,        /* lineNo */
+  "cmldiv",                            /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgetrfs.m"/* pathName */
+};
+
+emlrtRSInfo dc_emlrtRSI = { 9,         /* lineNo */
   "int",                               /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\int.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/int.m"/* pathName */
 };
 
-emlrtRSInfo cc_emlrtRSI = { 82,        /* lineNo */
-  "ceval_xgetrf",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgetrf.m"/* pathName */
-};
-
-emlrtRSInfo dc_emlrtRSI = { 78,        /* lineNo */
-  "ceval_xgetrf",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgetrf.m"/* pathName */
-};
-
-emlrtRSInfo ec_emlrtRSI = { 58,        /* lineNo */
-  "ceval_xgetrf",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgetrf.m"/* pathName */
-};
-
-emlrtRSInfo gc_emlrtRSI = { 50,        /* lineNo */
-  "ceval_xgetrf",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgetrf.m"/* pathName */
-};
-
-emlrtRSInfo hc_emlrtRSI = { 27,        /* lineNo */
+emlrtRSInfo ec_emlrtRSI = { 28,        /* lineNo */
   "repmat",                            /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\lib\\matlab\\elmat\\repmat.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/lib/matlab/elmat/repmat.m"/* pathName */
 };
 
-emlrtRSInfo ic_emlrtRSI = { 8,         /* lineNo */
+emlrtRSInfo fc_emlrtRSI = { 8,         /* lineNo */
   "majority",                          /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\majority.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/majority.m"/* pathName */
 };
 
-emlrtRSInfo jc_emlrtRSI = { 31,        /* lineNo */
+emlrtRSInfo gc_emlrtRSI = { 31,        /* lineNo */
   "infocheck",                         /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\infocheck.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/infocheck.m"/* pathName */
 };
 
-emlrtRSInfo lc_emlrtRSI = { 76,        /* lineNo */
-  "xtrsm",                             /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo mc_emlrtRSI = { 77,        /* lineNo */
-  "xtrsm",                             /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo nc_emlrtRSI = { 132,       /* lineNo */
-  "ceval_xtrsm",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo oc_emlrtRSI = { 133,       /* lineNo */
-  "ceval_xtrsm",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo pc_emlrtRSI = { 134,       /* lineNo */
-  "ceval_xtrsm",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo qc_emlrtRSI = { 135,       /* lineNo */
-  "ceval_xtrsm",                       /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xtrsm.m"/* pathName */
-};
-
-emlrtRSInfo vc_emlrtRSI = { 37,        /* lineNo */
+emlrtRSInfo mc_emlrtRSI = { 85,        /* lineNo */
   "ceval_xgeqp3",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgeqp3.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
 };
 
-emlrtRSInfo wc_emlrtRSI = { 38,        /* lineNo */
+emlrtRSInfo nc_emlrtRSI = { 86,        /* lineNo */
   "ceval_xgeqp3",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgeqp3.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
 };
 
-emlrtRSInfo xc_emlrtRSI = { 64,        /* lineNo */
+emlrtRSInfo oc_emlrtRSI = { 91,        /* lineNo */
   "ceval_xgeqp3",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgeqp3.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
 };
 
-emlrtRSInfo yc_emlrtRSI = { 67,        /* lineNo */
+emlrtRSInfo pc_emlrtRSI = { 119,       /* lineNo */
   "ceval_xgeqp3",                      /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xgeqp3.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
 };
 
-emlrtRSInfo id_emlrtRSI = { 93,        /* lineNo */
+emlrtRSInfo qc_emlrtRSI = { 123,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo sc_emlrtRSI = { 135,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo tc_emlrtRSI = { 137,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo uc_emlrtRSI = { 142,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo vc_emlrtRSI = { 148,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo wc_emlrtRSI = { 152,       /* lineNo */
+  "ceval_xgeqp3",                      /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xgeqp3.m"/* pathName */
+};
+
+emlrtRSInfo fd_emlrtRSI = { 93,        /* lineNo */
   "ceval_xunormqr",                    /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xunormqr.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xunormqr.m"/* pathName */
 };
 
-emlrtRSInfo jd_emlrtRSI = { 80,        /* lineNo */
+emlrtRSInfo gd_emlrtRSI = { 80,        /* lineNo */
   "ceval_xunormqr",                    /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xunormqr.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xunormqr.m"/* pathName */
 };
 
-emlrtRSInfo kd_emlrtRSI = { 79,        /* lineNo */
+emlrtRSInfo hd_emlrtRSI = { 79,        /* lineNo */
   "ceval_xunormqr",                    /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xunormqr.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xunormqr.m"/* pathName */
 };
 
-emlrtRSInfo ld_emlrtRSI = { 59,        /* lineNo */
+emlrtRSInfo id_emlrtRSI = { 59,        /* lineNo */
   "ceval_xunormqr",                    /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\xunormqr.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/xunormqr.m"/* pathName */
 };
 
-emlrtRSInfo vd_emlrtRSI = { 32,        /* lineNo */
+emlrtRSInfo rd_emlrtRSI = { 132,       /* lineNo */
+  "mtimes",                            /* fcnName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+blas/mtimes.m"/* pathName */
+};
+
+emlrtRSInfo sd_emlrtRSI = { 32,        /* lineNo */
   "xdotu",                             /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdotu.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+blas/xdotu.m"/* pathName */
 };
 
-emlrtRSInfo wd_emlrtRSI = { 49,        /* lineNo */
+emlrtRSInfo td_emlrtRSI = { 49,        /* lineNo */
   "xdot",                              /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdot.m"/* pathName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+blas/xdot.m"/* pathName */
 };
 
-emlrtRSInfo xd_emlrtRSI = { 50,        /* lineNo */
-  "xdot",                              /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdot.m"/* pathName */
-};
-
-emlrtRSInfo yd_emlrtRSI = { 83,        /* lineNo */
-  "ceval_xdot",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdot.m"/* pathName */
-};
-
-emlrtRSInfo ae_emlrtRSI = { 84,        /* lineNo */
-  "ceval_xdot",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdot.m"/* pathName */
-};
-
-emlrtRSInfo be_emlrtRSI = { 85,        /* lineNo */
-  "ceval_xdot",                        /* fcnName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+blas\\xdot.m"/* pathName */
-};
-
-emlrtRTEInfo db_emlrtRTEI = { 45,      /* lineNo */
+emlrtRTEInfo h_emlrtRTEI = { 48,       /* lineNo */
   13,                                  /* colNo */
   "infocheck",                         /* fName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\infocheck.m"/* pName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/infocheck.m"/* pName */
 };
 
-emlrtRTEInfo eb_emlrtRTEI = { 48,      /* lineNo */
+emlrtRTEInfo i_emlrtRTEI = { 45,       /* lineNo */
   13,                                  /* colNo */
   "infocheck",                         /* fName */
-  "C:\\Program Files\\MATLAB\\R2019a\\toolbox\\eml\\eml\\+coder\\+internal\\+lapack\\infocheck.m"/* pName */
+  "/usr/local/MATLAB/R2020a/toolbox/eml/eml/+coder/+internal/+lapack/infocheck.m"/* pName */
 };
 
 /* End of code generation (PongEffectTrunc_data.c) */

@@ -3,32 +3,26 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * xtrsm.h
+ * mtimes.h
  *
- * Code generation for function 'xtrsm'
+ * Code generation for function 'mtimes'
  *
  */
 
-#ifndef XTRSM_H
-#define XTRSM_H
+#pragma once
 
 /* Include files */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
 #include "rtwtypes.h"
 #include "PongEffectTrunc_types.h"
 
 /* Function Declarations */
-extern void b_xtrsm(int32_T m, const emxArray_real_T *A, int32_T lda, real_T
-                    B_data[], int32_T ldb);
-extern void xtrsm(int32_T m, const emxArray_real_T *A, int32_T lda, real_T
-                  B_data[], int32_T ldb);
+real_T mtimes(const real_T A_data[], const int32_T A_size[1], const
+              emxArray_real_T *B);
 
-#endif
-
-/* End of code generation (xtrsm.h) */
+/* End of code generation (mtimes.h) */
