@@ -111,7 +111,7 @@ while(i <= 10^6)
     plotMed = plotMed+1;
     
     if(mod(plotMed,itePlot)==0)
-        statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
+%         statPrint(scorePlot,rimbalziPlot,scorePlotmed,scorePlotFilter,rimbalziPlotmed,rimbalziPlotFilter)
     end
     
     if(mod(plotMed,iSave) == 0)
