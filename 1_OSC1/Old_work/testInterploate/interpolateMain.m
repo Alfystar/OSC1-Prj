@@ -31,7 +31,7 @@ global w;
 tic
 [w] = interpolate (G,Q);
 if( strcmp(speed,"trunc") )
-    [~,I] = sort(w);
+    [~,I] = sort(abs(w));
     for i = 1:floor(length(w)*0.5)
         w(I(i)) = 0;
     end
@@ -81,7 +81,7 @@ for i1 = 1 : nCenterX
 end
 
 surf(X,Y,Z,'FaceColor','g','FaceAlpha',0.15,'EdgeColor','none');
-legend("RBF", "RBF center","F");
+legend("RBF", "RBF center");
 tplot = toc;
 fprintf("END of Plotting\n")
 
@@ -129,9 +129,7 @@ end
 
 function [val] = f(x,y)
 % val = x.^2+y.^2;  %Parabola
-% val = sin(x);  %sinusoidale
-% val = sin(x)+cos(y);  %sinusoidale
-val = sin((x/10).^2)+cos((y/10).^2);  %sinusoidale
+val = sin(x)+cos(y);  %sinusoidale
 % val = 3*x+2*y;  %piano
 
 end
@@ -152,8 +150,6 @@ for i = 1 : (nCenterX * nCenterY -1)
 end
 
 G = G + G' - I;
-% G = gpuArray(G);
-
 end
 
 function [id] = idCenter(i1,i2)
@@ -176,11 +172,7 @@ i2 = (id - i1)/nCenterX + 1;
 end
 
 function [w] = interpolate (G,Q)
-
-% b = gpuArray( Bvector(Q) );
 b = Bvector(Q);
-% Ginv = pinv(G);
-
 w = G \ b ;
 end
 
@@ -191,13 +183,6 @@ global nCenterX nCenterY;
 
 B = zeros(nCenterX * nCenterY,1);
 i=1;
-% for i1 = 1 : nCenterX
-%     for i2 = 1 : nCenterY
-%         %         fprintf("F(C_%d,%d) = %d\n",i1,i2,i);
-%         B(i) = points(i1, i2);
-%         i=i+1;
-%     end
-% end
 for i = 1:length(B)
     [i1,i2] = centerId(i);
     B(i) = points(i1, i2);
@@ -208,21 +193,11 @@ function  [rho] = NodeValue (state)
 global nCenterX nCenterY beta;
 
 rho = zeros(nCenterX * nCenterY, 1);
-% i=1;
-% for i1 = 1 : nCenterX
-%     for i2 = 1 : nCenterY
-%         [C1] = index2state(i1, i2);
-%         rho(i) = exp(-beta*(sum((C1-state).^2))^0.5);
-%         i=i+1;
-%         
-%     end
-% end
 for i = 1:length(rho)
     [i1,i2] = centerId(i);
     [C1] = index2state(i1, i2);
     rho(i) = exp(-beta*(sum((C1-state).^2))^0.5);
 end
-% rho = gpuArray( rho );
 
 end
 

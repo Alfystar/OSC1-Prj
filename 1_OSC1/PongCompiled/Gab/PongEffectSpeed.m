@@ -3,7 +3,7 @@
 % SBROnOff: 1 attiva la rete RBF, 0 usa il classico RL
 % SBRspeedOnOff (utile solo se SBROnOff=1) : 1 Calcolo rapido prendendo
 %                       pochi centri vicini, 0 Calcolo totale con tutti i centri
-function [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffectTrunc(xb0,yb0,ys0,Qup,Qdown,Qstill,~, G, SBROnOff,SBRspeedOnOff)
+function [chk,Qup,Qdown,Qstill,score,rimbalzi, G] = PongEffectSpeed(xb0,yb0,ys0,Qup,Qdown,Qstill,~, G, SBROnOff,SBRspeedOnOff)
 
 
 global L H alpha gamma eps %V

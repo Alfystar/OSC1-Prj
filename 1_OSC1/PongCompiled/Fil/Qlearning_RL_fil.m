@@ -64,7 +64,7 @@ iSave = 10^2;
 G = 0;
 a = 1/2^6;
 b = 1/2^10;
-while(i <= 10^3)
+while(i <= 10^6)
     %     break;      %Commentare per proseguire addestramento
     
     QupOld = Qup;
