@@ -12,8 +12,8 @@ velSig = 3;             % 1 = neg, 2 = ~0 , 3 = pos, 2 Var, Vx e Vy
 global L H alpha gamma eps V
 L = 10;                  % profondità del campo
 H = 8;                  % altezza del campo
-gamma = 0.1;              % Peso esperienze future
-alpha = 0.9;            % Peso nuova esperienza
+gamma = 0.3;              % Peso esperienze future
+alpha = 0.8;            % Peso nuova esperienza
 eps = 0.01;              % Tolleranza tiro moneta per esplorare (0 non esploro)
 V = 1:Vn:H-1;
 i=1;        % Variabile per contare le iterazioni
