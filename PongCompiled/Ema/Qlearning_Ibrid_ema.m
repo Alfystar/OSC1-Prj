@@ -15,6 +15,10 @@ H = 8;                  % altezza del campo
 gamma = 0.1;              % Peso esperienze future
 alpha = 0.9;            % Peso nuova esperienza
 eps = 0.01;              % Tolleranza tiro moneta per esplorare (0 non esploro)
+
+alphamax = 1;   % per garantire la convergenza di alpha a zero    
+                % (mantenendo l'andamento a dente di sega)
+
 V = 1:Vn:H-1;
 i=1;        % Variabile per contare le iterazioni
 
@@ -98,7 +102,8 @@ while(i <= 10^6)
         rimbalziTot = rimbalziTot + rimbalzi;
         alpha = alpha - (0.9/frameSpike);
         if(alpha <=1/frameSpike)
-            alpha = 1;
+            alphamax = alphamax*0.9995;
+            alpha = alphamax;
         end
 %         fprintf("|%d",i);
         i = i+1;

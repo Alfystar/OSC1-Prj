@@ -165,6 +165,7 @@ plot(scorePlot);
 grid on
 legend("score");
 
+
 subplot(1,2,2);
 plot(rimbalziPlot);
 grid on
