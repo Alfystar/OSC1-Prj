@@ -131,7 +131,7 @@ end
 %     end
 % end
 
-%% Run Graphical Simulation
+%% Visualizzazione Gioco
 clc
 epsOld = eps;
 eps = 0;

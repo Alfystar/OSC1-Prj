@@ -130,7 +130,7 @@ for i =i/Hn*L 1:L+1
     end
 end
 
-%% Simulazione Grafica Pong
+%% Visualizzazione Gioco
 clc
 epsOld = eps;
 eps = 0;
